@@ -49,6 +49,8 @@
 - (Jason *)              attach:(JasonViewController *)viewController;
 - (Jason *)detach:(JasonViewController *)viewController;
 
+- (NSDictionary *) getSettings;
+
 - (void)                 cancel;
 - (void)                 ok;
 - (void)ok:(NSDictionary *)result;

@@ -7,6 +7,7 @@
 #import "JasonAppDelegate.h"
 #import "JasonLogger.h"
 #import "JasonNSClassFromString.h"
+#import "JasonATTrackingManager.h"
 
 static NSURL * _launchURL;
 static NSArray * _services;
@@ -211,6 +212,9 @@ static NSArray * _services;
     DTLogInfo (@"Begin Building Screen");
 
     [[Jason client] start:nil];
+    
+    [JasonATTrackingManager showWithSettings:[[Jason client] getSettings]];
+    
     return YES;
 }
 
