@@ -24,6 +24,9 @@ This version have minor fixes and updates.
 ``` 
 Would fetch the url using _POST_ instead of _GET_ (Useful for _Bubble_ or similar systems).
 
+- Ability to show ATTracking alert in iOS >= 14.5:
+Set `tracking_enabled` to true inside _settings.plist_.
+
 ### Changed
 
 - Bumped to minimum iOS version `12.0`.
@@ -51,6 +54,7 @@ Huge thanks to the following persons that helped in this release:
 - Mike from https://www.fus-ed.com/ (Sponsored Firebase extension for iOS and other fixes).
 - https://github.com/vini-brito[Vinicius Brito] (Requested and sponsored the Mixin POST feature).
 - _@TT Multi_ in Telegram Group (Sponsored some Cookies and Coffee).
+- Dooble Team (Sponsored ATTracking update in iOS).
 - All the wonderful people in the https://t.me/jasonelle[Jasonelle Telegram Community].
 
 ## https://github.com/jasonelle/jasonelle/releases/tag/v2.0[2.0.0]
