@@ -21,9 +21,9 @@ Releases are made in the [Jasonelle Repo](https://github.com/jasonelle/jasonelle
 This repository uses `develop` branch to store the bleeding
 edge code. More details in the [CONTRIBUTING](CONTRIBUTING.md) file.
 
-## [Changelog](CHANGELOG.md)
+## [Changelog](CHANGELOG.adoc)
 
-The [CHANGELOG](CHANGELOG.md) contains the release notes
+The [CHANGELOG](CHANGELOG.adoc) contains the release notes
 of each version.
 
 ## [Documentation](https://jasonelle.com/docs)
