@@ -28,11 +28,16 @@
 */
 
 #import <Foundation/Foundation.h>
+#import <Availability.h>
 
 
 FOUNDATION_EXPORT double TDOAuthVersionNumber;
 FOUNDATION_EXPORT const unsigned char TDOAuthVersionString[];
 
+#if (defined(__IPHONE_8_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0)) || \
+    (defined(__MAC_10_0)  && (__MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_10))
+#define USE_NSURLCOMPONENTS
+#endif
 
 typedef NS_ENUM(NSInteger, TDOAuthSignatureMethod) {
     TDOAuthSignatureMethodHmacSha1,
@@ -41,6 +46,7 @@ typedef NS_ENUM(NSInteger, TDOAuthSignatureMethod) {
 typedef NS_ENUM(NSInteger, TDOAuthContentType) {
     TDOAuthContentTypeUrlEncodedForm,
     TDOAuthContentTypeJsonObject,
+    TDOAuthContentTypeUrlEncodedQuery,
 };
 
 /**
@@ -78,6 +84,16 @@ typedef NS_ENUM(NSInteger, TDOAuthContentType) {
                         accessToken:(NSString *)accessToken
                         tokenSecret:(NSString *)tokenSecret;
 
+#ifdef USE_NSURLCOMPONENTS
+/**
+  Allow to pass NSURLComponents. READ THE DOCUMENTATION IN PREVIOUS GET METHODS!
+ */
++ (NSURLRequest *)URLRequestForGETURLComponents:(NSURLComponents *)urlComponents
+                                    consumerKey:(NSString *)consumerKey
+                                 consumerSecret:(NSString *)consumerSecret
+                                    accessToken:(NSString *)accessToken
+                                    tokenSecret:(NSString *)tokenSecret;
+#endif
 /**
   We always POST with HTTPS. This is because at least half the time the user's
   data is at least somewhat private, but also because apparently some carriers
@@ -100,8 +116,9 @@ typedef NS_ENUM(NSInteger, TDOAuthContentType) {
  @p requestMethod may be any string value. There is no validation, so remember that all
  currently-defined HTTP methods are uppercase and the RFC specifies that the method
  is case-sensitive.
- @p dataEncoding allows for the transmission of data as either URL-encoded form data or
- JSON by passing the value TDOAuthContentTypeUrlEncodedForm or TDOAuthContentTypeJsonObject.
+ @p dataEncoding allows for the transmission of data as either URL-encoded form data,
+ query string or JSON by passing the value TDOAuthContentTypeUrlEncodedForm,
+ TDOAuthContentTypeUrlEncodedQuery or TDOAuthContentTypeJsonObject.
  This parameter is ignored for the requestMethod "GET".
  @p headerValues accepts a hash of key-value pairs (both must be strings) that specify
  HTTP header values to be included in the resulting URL Request. For example, the argument

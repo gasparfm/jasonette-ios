@@ -77,20 +77,20 @@ static NSMutableDictionary * _stylesheet = nil;
                                              CGSize size = image.size;
 
                                              if (size.width > 0 && size.height > 0) {
-                                             if (layer[@"style"]) {
-                                             [self    setStyle:layer[@"style"]
-                                                ForLayerChild:layerChild
-                                             ofSize:[NSValue valueWithCGSize:size]];
+                                                 if (layer[@"style"]) {
+                                                     [self    setStyle:layer[@"style"]
+                                                         ForLayerChild:layerChild
+                                                                ofSize:[NSValue valueWithCGSize:size]];
 
-                                             if (layer[@"style"][@"color"]) {
-                                             // Setting tint color for an image
-                                             UIColor * newColor = [JasonHelper colorwithHexString:layer[@"style"][@"color"]
-                                                                                   alpha:1.0];
-                                             UIImage * newImage = [JasonHelper colorize:image
-                                                                          into:newColor];
-                                             layerChild.image = newImage;
-                                             }
-                                             }
+                                                     if (layer[@"style"][@"color"]) {
+                                                         // Setting tint color for an image
+                                                         UIColor * newColor = [JasonHelper colorwithHexString:layer[@"style"][@"color"]
+                                                                                                        alpha:1.0];
+                                                         UIImage * newImage = [JasonHelper colorize:image
+                                                                                               into:newColor];
+                                                         layerChild.image = newImage;
+                                                     }
+                                                 }
                                              }
                                          }];
                 }
@@ -174,6 +174,7 @@ static NSMutableDictionary * _stylesheet = nil;
     }
 
     UITapGestureRecognizer * singleFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(layerTap:)];
+
     [view addGestureRecognizer:singleFingerTap];
 }
 
@@ -327,6 +328,7 @@ static NSMutableDictionary * _stylesheet = nil;
     }
 
     NSMutableDictionary * stylized_item = [item mutableCopy];
+
     stylized_item[@"style"] = new_style;
     return stylized_item;
 }

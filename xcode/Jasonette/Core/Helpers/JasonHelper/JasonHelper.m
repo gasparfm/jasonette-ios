@@ -32,9 +32,11 @@
 
     NSLocale * locale = [[NSLocale alloc]
                          initWithLocaleIdentifier:@"en_US_POSIX"];
+
     [dateFormatter setLocale:locale];
 
     NSDate * date = [dateFormatter dateFromString:dateString];
+
     return date;
 }
 
@@ -46,6 +48,7 @@
     NSArray * recipents = @[phone];
 
     MFMessageComposeViewController * messageController = [[MFMessageComposeViewController alloc] init];
+
     [messageController setRecipients:recipents];
     [messageController setBody:message];
     [messageController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
@@ -183,13 +186,13 @@
 
     // Less common colors
     NSDictionary * colors = @{
-            @"red": [UIColor redColor],
-            @"green": [UIColor greenColor],
-            @"yellow": [UIColor yellowColor],
-            @"blue": [UIColor blueColor],
-            @"magenta": [UIColor magentaColor],
-            @"gray": [UIColor grayColor],
-            @"orange": [UIColor orangeColor]
+        @"red": [UIColor redColor],
+        @"green": [UIColor greenColor],
+        @"yellow": [UIColor yellowColor],
+        @"blue": [UIColor blueColor],
+        @"magenta": [UIColor magentaColor],
+        @"gray": [UIColor grayColor],
+        @"orange": [UIColor orangeColor]
     };
 
     UIColor * color = colors[colorName];
@@ -244,6 +247,7 @@
     UIGraphicsBeginImageContextWithOptions (newSize, NO, 0);
     [image drawInRect:scaledImageRect];
     UIImage * scaledImage = UIGraphicsGetImageFromCurrentImageContext ();
+
     UIGraphicsEndImageContext ();
 
     return scaledImage;
@@ -327,6 +331,7 @@
     UIGraphicsBeginImageContextWithOptions (image.size, YES, [[UIScreen mainScreen] scale]);
 
     CGRect contextRect;
+
     contextRect.origin.x = 0.0f;
     contextRect.origin.y = 0.0f;
     contextRect.size = [image size];
@@ -334,6 +339,7 @@
     // Retrieve source image and begin image context
     CGSize itemImageSize = [image size];
     CGPoint itemImagePosition;
+
     itemImagePosition.x = ceilf ((contextRect.size.width - itemImageSize.width) / 2);
     itemImagePosition.y = ceilf ((contextRect.size.height - itemImageSize.height) );
 
@@ -364,6 +370,7 @@
     CGContextEndTransparencyLayer (c);
 
     UIImage * img = UIGraphicsGetImageFromCurrentImageContext ();
+
     UIGraphicsEndImageContext ();
     return img;
 }
@@ -418,6 +425,7 @@
                               writerWithMaxDepth:0
                                    humanReadable:NO
                                         sortKeys:YES];
+
     @try {
         NSString * ret = [writer stringWithObject:value];
 
@@ -533,7 +541,8 @@
 
 + (void)setStatusBarBackgroundColor:(UIColor *)color
 {
-    if (@available(iOS 13, *)) {} else {
+    if (@available(iOS 13, *)) {
+    } else {
         UIView * statusBar = [[[UIApplication
                                 sharedApplication]
                                valueForKey:@"statusBarWindow"]
@@ -588,6 +597,7 @@
 
 
     NSURLComponents * urlComponents2 = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:urlString] resolvingAgainstBaseURL:NO];
+
     urlComponents2.query = nil; // Strip out query parameters.
     return [urlComponents.string isEqualToString:urlComponents2.string];
 }
@@ -772,6 +782,7 @@
     }
 
     UIImage * image = UIGraphicsGetImageFromCurrentImageContext ();
+
     UIGraphicsEndImageContext ();
     return image;
 }
@@ -1074,53 +1085,52 @@
     return [JasonHelper read_local_json:@"file://error.json"];
 }
 
-
-+ (nullable NSDictionary *) hjson_to_json: (nonnull NSString *) content {
-    
++ (nullable NSDictionary *)hjson_to_json:(nonnull NSString *)content {
     NSStringEncoding encoding;
     NSError * error = nil;
-    
+
     JSContext * context = [JSContext new];
+
     [context setExceptionHandler:^(JSContext * context, JSValue * value) {
-        DTLogWarning (@"%@", value);
-    }];
-    
+                 DTLogWarning (@"%@", value);
+             }];
+
     [context evaluateScript:@"var console = {};"];
     context[@"console"][@"log"] = ^(NSString * message) {
         DTLogDebug (@"JS: %@", message);
     };
 
-    
+
     NSString * renderfile = [[NSBundle mainBundle] pathForResource:@"hjson" ofType:@"js"];
     NSString * renderjs = [NSString stringWithContentsOfFile:renderfile
                                                 usedEncoding:&encoding
                                                        error:&error];
-    
-    DTLogDebug(@"Loading hjson.js");
+
+    DTLogDebug (@"Loading hjson.js");
     [context evaluateScript:renderjs];
-    
+
     JSValue * render = context[@"to_json"];
     JSValue * val = [render callWithArguments:@[content]];
     NSString * json = [val toString];
-    
-    DTLogDebug(@"%@", json);
-    
+
+    DTLogDebug (@"%@", json);
+
     error = nil;
-    
+
     NSDictionary * result = [NSJSONSerialization
-              JSONObjectWithData:[json
-                                  dataUsingEncoding:NSUTF8StringEncoding]
-              options:kNilOptions
-              error:&error];
-    
-    
-   
-    
-    if(error) {
-        DTLogWarning(@"%@", error);
+                             JSONObjectWithData:[json
+                                                 dataUsingEncoding:NSUTF8StringEncoding]
+                                        options:kNilOptions
+                                          error:&error];
+
+
+
+
+    if (error) {
+        DTLogWarning (@"%@", error);
         return nil;
     }
-    
+
     return result;
 }
 
@@ -1150,12 +1160,13 @@
 
         if (error) {
             NSString * content = [JasonHelper read_local_file:json];
-            if(content) {
-                DTLogDebug(@"Trying hjson.js");
+
+            if (content) {
+                DTLogDebug (@"Trying hjson.js");
                 result = [JasonHelper hjson_to_json:content];
             }
-            
-            if(!result) {
+
+            if (!result) {
                 result = [JasonHelper loadErrorJson];
             }
         }
@@ -1172,6 +1183,7 @@
 
     normalized_url = [normalized_url stringByAppendingString:[NSString stringWithFormat:@"|%@", options]];
     NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:@"[/:]" options:NSRegularExpressionCaseInsensitive error:nil];
+
     normalized_url = [regex stringByReplacingMatchesInString:normalized_url options:0 range:NSMakeRange (0, [normalized_url length]) withTemplate:@"_"];
     normalized_url = [[normalized_url componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] componentsJoinedByString:@""];
     return normalized_url;

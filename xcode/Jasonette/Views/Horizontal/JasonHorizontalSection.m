@@ -16,6 +16,7 @@
     [super awakeFromNib];
 
     UICollectionViewFlowLayout * flowLayout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
+
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     flowLayout.minimumLineSpacing = 0.0;
     flowLayout.minimumInteritemSpacing = 0.0;

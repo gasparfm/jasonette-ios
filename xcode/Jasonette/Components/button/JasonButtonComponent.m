@@ -85,20 +85,20 @@
                              placeholderImage:placeholder_image
                                     completed:^(UIImage * i, NSError * error, SDImageCacheType cacheType, NSURL * imageURL) {
                                         if (!error) {
-                                        JasonComponentFactory.imageLoaded[url] = [NSValue valueWithCGSize:i.size];
+                                            JasonComponentFactory.imageLoaded[url] = [NSValue valueWithCGSize:i.size];
 
-                                        if (style[@"color"]) {
-                                        NSString * colorHex = style[@"color"];
-                                        UIColor * c = [JasonHelper colorwithHexString:colorHex
-                                                                    alpha:1.0];
-                                        UIImage * image = [imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                                        [component setTintColor:c];
-                                        [component setImage:image
-                                        forState:UIControlStateNormal];
-                                        } else {
-                                        [component setImage:imageView.image
-                                        forState:UIControlStateNormal];
-                                        }
+                                            if (style[@"color"]) {
+                                                NSString * colorHex = style[@"color"];
+                                                UIColor * c = [JasonHelper colorwithHexString:colorHex
+                                                                                        alpha:1.0];
+                                                UIImage * image = [imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                                                [component setTintColor:c];
+                                                [component setImage:image
+                                                           forState:UIControlStateNormal];
+                                            } else {
+                                                [component setImage:imageView.image
+                                                           forState:UIControlStateNormal];
+                                            }
                                         }
                                     }];
             }

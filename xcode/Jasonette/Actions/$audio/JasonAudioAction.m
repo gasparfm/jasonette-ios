@@ -184,13 +184,13 @@
                 commandCenter.nextTrackCommand.enabled = NO;
 
                 [commandCenter.playCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus (MPRemoteCommandEvent * _Nonnull event) {
-                    [[Jason client] call:@{ @"type": @"$audio.pause" }];
-                    return MPRemoteCommandHandlerStatusSuccess;
-                }];
+                                               [[Jason client] call:@{ @"type": @"$audio.pause" }];
+                                               return MPRemoteCommandHandlerStatusSuccess;
+                                           }];
                 [commandCenter.pauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus (MPRemoteCommandEvent * _Nonnull event) {
-                    [[Jason client] call:@{ @"type": @"$audio.pause" }];
-                    return MPRemoteCommandHandlerStatusSuccess;
-                }];
+                                                [[Jason client] call:@{ @"type": @"$audio.pause" }];
+                                                return MPRemoteCommandHandlerStatusSuccess;
+                                            }];
 
 
 
@@ -234,14 +234,14 @@
                                          }
                                         completed:^(UIImage * i, NSError * error, SDImageCacheType cacheType, BOOL finished, NSURL * imageURL) {
                                             MPMediaItemArtwork * albumArt = [[MPMediaItemArtwork alloc] initWithImage:i];
-                                            [songInfo  setObject:title
-                                            forKey:MPMediaItemPropertyTitle];
-                                            [songInfo  setObject:author
-                                            forKey:MPMediaItemPropertyArtist];
-                                            [songInfo  setObject:album
-                                            forKey:MPMediaItemPropertyAlbumTitle];
-                                            [songInfo  setObject:albumArt
-                                            forKey:MPMediaItemPropertyArtwork];
+                                            [songInfo setObject:title
+                                                         forKey:MPMediaItemPropertyTitle];
+                                            [songInfo setObject:author
+                                                         forKey:MPMediaItemPropertyArtist];
+                                            [songInfo setObject:album
+                                                         forKey:MPMediaItemPropertyAlbumTitle];
+                                            [songInfo setObject:albumArt
+                                                         forKey:MPMediaItemPropertyArtwork];
                                             [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
                                         }];
                 }

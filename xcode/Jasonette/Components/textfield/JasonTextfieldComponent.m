@@ -26,6 +26,7 @@
     component.payload = payload;
 
     NSString * keyboard = json[@"keyboard"];
+
     keyboard = keyboard ? keyboard : @"text";
 
     if ([keyboard isEqualToString:@"text"]) {

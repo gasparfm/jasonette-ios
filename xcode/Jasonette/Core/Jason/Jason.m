@@ -147,20 +147,20 @@
     [self
      include:jsonResponseObject
            andCompletionHandler:^(id res)
-    {
-        id result = @{};
+               {
+               id result = @{};
 
-        if (res[@"$jason"]) {
-            result = res[@"$jason"];
-        } else {
-            result = [JasonHelper loadErrorJson][@"$jason"];
-            DTLogError (@"Missing $jason property in \n%@\n\n", res);
-        }
+               if (res[@"$jason"]) {
+                 result = res[@"$jason"];
+               } else {
+                 result = [JasonHelper loadErrorJson][@"$jason"];
+                 DTLogError (@"Missing $jason property in \n%@\n\n", res);
+               }
 
-        self->VC.original = @{ @"$jason": result };
-        [self drawViewFromJason:self->VC.original
-                        asFinal:final];
-    }];
+               self->VC.original = @{ @"$jason": result };
+               [self drawViewFromJason:self->VC.original
+                             asFinal:final];
+           }];
 }
 
 #pragma mark - Jason Core API (USE ONLY THESE METHODS TO ACCESS Jason Core!)
@@ -179,39 +179,36 @@
     JasonAppDelegate * app = (JasonAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDictionary * plist = [self getSettings];
     BOOL appendNonce = [plist[@"append_nonce_to_url"] boolValue];
-    
-    DTLogDebug((appendNonce ? @"Nonce Activated" : @"Nonce Inactive"));
-    
+
+    DTLogDebug ((appendNonce ? @"Nonce Activated" : @"Nonce Inactive"));
+
     ROOT_URL = plist[@"url"];
     NSURLComponents * components = [[NSURLComponents alloc]
                                     initWithURL:[NSURL URLWithString:ROOT_URL]
-                                    resolvingAgainstBaseURL:NO];
-    
-    if(appendNonce && components) {
-        
-        if(![components.scheme isEqualToString:@"file"]) {
-            
-            DTLogDebug(@"Adding Nonce");
-            
+                         resolvingAgainstBaseURL           :NO];
+
+    if (appendNonce && components) {
+        if (![components.scheme isEqualToString:@"file"]) {
+            DTLogDebug (@"Adding Nonce");
+
             NSURLQueryItem * nonce = [[NSURLQueryItem alloc]
                                       initWithName:@"jasonnonce" value:[NSString
                                                                         stringWithFormat:@"%u%f",
-                                                                        arc4random_uniform(10000) + 1,
-                                                                        CFAbsoluteTimeGetCurrent()]];
-            
+                                                                        arc4random_uniform (10000) + 1,
+                                                                        CFAbsoluteTimeGetCurrent ()]];
+
             NSMutableArray * items = [NSMutableArray
                                       arrayWithCapacity:[components.queryItems count] + 1];
             [items addObject:nonce];
-            
-            [components setQueryItems: items];
-            
+
+            [components setQueryItems:items];
+
             ROOT_URL = [components.URL absoluteString];
-            
         } else {
-            DTLogDebug(@"file:// scheme used. nonce not added.");
+            DTLogDebug (@"file:// scheme used. nonce not added.");
         }
     }
-    
+
     DTLogDebug (@"Root Url %@", ROOT_URL);
 
     if (!ROOT_URL || [ROOT_URL isEqualToString:@""] || !components) {
@@ -260,7 +257,7 @@
         }
 
         if (href[@"loading"]) {
-            vc.loading = href[@"loading"];
+            vc.loading = [href[@"loading"] boolValue];
             DTLogDebug (@"Is Loading? %d", vc.loading);
         }
     }
@@ -454,11 +451,11 @@
     if (turnon) {
         [JDStatusBarNotification addStyleNamed:@"SBStyle1"
                                        prepare:^JDStatusBarStyle *(JDStatusBarStyle * style) {
-            style.barColor = self->navigationController.navigationBar.backgroundColor;
-            style.textColor = self->navigationController.navigationBar.tintColor;
-            style.animationType = JDStatusBarAnimationTypeFade;
-            return style;
-        }];
+                                           style.barColor = self->navigationController.navigationBar.backgroundColor;
+                                           style.textColor = self->navigationController.navigationBar.tintColor;
+                                           style.animationType = JDStatusBarAnimationTypeFade;
+                                           return style;
+                                       }];
         [JDStatusBarNotification showWithStatus:@"Loading" styleName:@"SBStyle1"];
 
         if (navigationController.navigationBar.barStyle == UIStatusBarStyleDefault) {
@@ -505,6 +502,7 @@
 
     VC.callback = memory._stack;
     NSDictionary * href = [self options];
+
     memory._stack = @{}; // empty stack before visiting
     [self go:href];
 }
@@ -656,10 +654,10 @@
                                                                    [self->menu_component close];
 
                                                                    if (item_action) {
-                                                                   [memory set_stack:item_action];
-                                                                   [self exec];
+                                                                       [memory set_stack:item_action];
+                                                                       [self exec];
                                                                    } else if (item_href) {
-                                                                   [self go:item_href];
+                                                                       [self go:item_href];
                                                                    }
                                                                }];
 
@@ -861,7 +859,7 @@
             args =  [self filloutTemplate:args withData:memory._register];
             memory._register = @{ @"$jason": args };
         } else {
-        // do nothing. keep the register and propgate
+            // do nothing. keep the register and propgate
         }
 
         id lambda = [[VC valueForKey:@"events"] valueForKey:name];
@@ -1159,6 +1157,64 @@
 
 # pragma mark - View initialization & teardown
 
+- (NSDictionary *) getMethodForUrl: (NSString *) url {
+    // Check for [POST|GET|PUT] method in Url
+   NSString * pattern = @"\\[(POST|GET|PUT|HEAD|DELETE)\\]";
+   NSError * regexError = nil;
+    
+   NSRegularExpression * regex = [NSRegularExpression
+   regularExpressionWithPattern:pattern
+                        options:NSRegularExpressionCaseInsensitive | NSRegularExpressionDotMatchesLineSeparators
+                          error:&regexError];
+   
+   if (regexError) {
+       DTLogWarning (@"Regex Error in Extracting URL pattern %@ error %@", pattern, regexError);
+   }
+
+    NSArray * matches = [regex matchesInString:url
+                                      options:NSMatchingWithoutAnchoringBounds
+                                        range:NSMakeRange (0, url.length)];
+    
+    
+    NSString * parsed = url;
+    NSString * method = @"get";
+    
+    
+    NSTextCheckingResult * match = [matches firstObject];
+    NSRange range;
+    
+    if(match) {
+        range = [match rangeAtIndex:0];
+        
+        if(range.length > 0) {
+            parsed = [url substringWithRange:NSMakeRange(0, url.length - range.length)];
+            
+            method = [[[url substringWithRange:range]
+                       lowercaseString]
+                      stringByTrimmingCharactersInSet:[NSCharacterSet
+                                                       characterSetWithCharactersInString:@"[]"]];
+        }
+        
+    }
+    
+    BOOL shouldDownload = YES;
+    // if the url contains brackets [] and its the same as the original
+    // it means it maybe has wrong format
+    // so its better to not download it or it could crash the app
+    if([parsed isEqualToString:url] && ([url containsString:@"["] || [url containsString:@"]"])) {
+        DTLogDebug(@"Mixin Parsed: %@ is equal to original url %@. Maybe is syntax error. Omitting download.", parsed, url);
+        parsed = @"";
+        shouldDownload = NO;
+    }
+    
+    return @{
+        @"original": url,
+        @"parsed": parsed,
+        @"method": method,
+        @"shouldDownload": @(shouldDownload)
+    };
+}
+
 - (void)         include:(id)json
     andCompletionHandler:(void (^)(id obj))callback
 {
@@ -1175,6 +1231,9 @@
     NSString * pattern = @"\"([+@])\"[ ]*:[ ]*\"([^$\"@]+@)?([^$\"]+)\"";
 
     NSMutableSet * urlSet = [NSMutableSet new];
+    
+    NSMutableDictionary * parsedMixinItems = [@{} mutableCopy];
+    
     NSRegularExpression * regex = [NSRegularExpression
                                    regularExpressionWithPattern:pattern
                                                         options:NSRegularExpressionCaseInsensitive | NSRegularExpressionDotMatchesLineSeparators
@@ -1208,10 +1267,18 @@
         if (group3.length > 0) {
             // Group 3 is for the URL
             NSString * url = [j substringWithRange:group3];
+            
+            NSDictionary * params = [self getMethodForUrl:url];
+            
+            DTLogDebug(@"Mixin Params: %@", params);
 
-            if (!VC.requires[url]) {
-                DTLogDebug (@"Adding object to url set %@", url);
-                [urlSet addObject:url];
+            if([params[@"shouldDownload"] boolValue]) {
+                if (!VC.requires[params[@"parsed"]]) {
+                    DTLogDebug (@"Adding Mixin URL %@", url);
+                    parsedMixinItems[params[@"parsed"]] = params;
+                    parsedMixinItems[url] = params;
+                    [urlSet addObject:params[@"parsed"]];
+                }
             }
         }
     }
@@ -1307,21 +1374,52 @@
 
                 // 6. Start request
 #pragma message "Start Request in Include"
-                [manager   GET:url
-                    parameters:parameters
-                       headers:nil
-                      progress:^(NSProgress * _Nonnull downloadProgress) { }
-                       success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject)
-                {
-                    self->VC.requires[url] = responseObject;
-                    dispatch_group_leave (requireGroup);
+                
+                DTLogDebug(@"Mixin Fetching %@ With Params %@", url, parsedMixinItems[url]);
+                
+                NSString * method = parsedMixinItems[url][@"method"];
+                NSString * originalUrl = parsedMixinItems[url][@"original"];
+                
+                // TODO: Maybe add a better handler and more http methods and params
+                if([method isEqualToString:@"post"]) {
+                    
+                    DTLogDebug(@"Fetching with POST");
+                    
+                    [manager   POST:url
+                                       parameters:parameters
+                                          headers:nil
+                                         progress:^(NSProgress * _Nonnull downloadProgress) { }
+                                          success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject)
+                                              {
+                                              self->VC.requires[originalUrl] = responseObject;
+                                              DTLogDebug(@"VC.requires %@", self->VC.requires);
+                                              dispatch_group_leave (requireGroup);
+                                          }
+                                          failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error)
+                                              {
+                                              DTLogWarning (@"Error Fetching JSON From Url %@ %@", url, error);
+                                              self->VC.requires[originalUrl] = @{};
+                                              dispatch_group_leave (requireGroup);
+                                          }];
+                } else {
+                    DTLogDebug(@"Fetching with GET");
+                    [manager   GET:url
+                                       parameters:parameters
+                                          headers:nil
+                                         progress:^(NSProgress * _Nonnull downloadProgress) { }
+                                          success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject)
+                                              {
+                                              self->VC.requires[originalUrl] = responseObject;
+                                              DTLogDebug(@"VC.requires %@", self->VC.requires);
+                                              dispatch_group_leave (requireGroup);
+                                          }
+                                          failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error)
+                                              {
+                                              DTLogWarning (@"Error Fetching JSON From Url %@ %@", url, error);
+                                              self->VC.requires[originalUrl] = @{};
+                                              dispatch_group_leave (requireGroup);
+                                          }];
                 }
-                       failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error)
-                {
-                    DTLogWarning (@"Error Fetching JSON From Url %@ %@", url, error);
-                    self->VC.requires[url] = @{};
-                    dispatch_group_leave (requireGroup);
-                }];
             }
         }
 
@@ -1341,10 +1439,12 @@
     callback (resolved);
 }
 
+#pragma mark - $require action
 - (void)require
 {
     DTLogInfo (@"Require Json");
     NSString * origin_url = VC.url;
+
     DTLogDebug (@"%@", origin_url);
 
     /*
@@ -1384,11 +1484,11 @@
             dispatch_group_enter (requireGroup);
 
             if ([url containsString:@"file://"]) {
-            // local
+                // local
                 return_value[url] = [JasonHelper read_local_json:url];
                 dispatch_group_leave (requireGroup);
             } else {
-            // 3. Setup networking
+                // 3. Setup networking
                 AFHTTPSessionManager * manager = [JasonNetworking manager];
                 AFJSONResponseSerializer * jsonResponseSerializer = [JasonNetworking serializer];
 
@@ -1441,15 +1541,15 @@
                        headers:nil
                       progress:^(NSProgress * _Nonnull downloadProgress) { }
                        success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject)
-                {
-                    return_value[url] = responseObject;
-                    dispatch_group_leave (requireGroup);
-                }
+                           {
+                           return_value[url] = responseObject;
+                           dispatch_group_leave (requireGroup);
+                       }
                        failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error)
-                {
-                    DTLogError (@"Failed Requiring %@ %@", url, error);
-                    dispatch_group_leave (requireGroup);
-                }];
+                           {
+                           DTLogError (@"Failed Requiring %@ %@", url, error);
+                           dispatch_group_leave (requireGroup);
+                       }];
             }
         }
     }
@@ -1486,11 +1586,14 @@
     });
 }
 
+#pragma mark - Mixin
 - (id)resolve_remote_reference:(NSString *)json
 {
-    DTLogDebug (@"Resolving Remote References");
+    DTLogInfo (@"Remote Reference Mixin");
+    DTLogDebug (@"Resolving Remote References For Json %@", json);
+    
     NSError * error;
-
+    // Mixins can be used with '@' or '+' symbol
     // Remote url with path - convert "@": "blah.blah@https://www.google.com" to "{{#include $root[\"https://www.google.com\"].blah.blah}}": {}
     // The pattern leaves out the pattern where it starts with "$" because that's a $document and will be resolved by resolve_local_reference
     NSString * remote_pattern_with_path = @"\"([+@])\"[ ]*:[ ]*\"(([^$\"@]+)(@))([^\"]+)\"";
@@ -1532,7 +1635,8 @@
 
 - (id)resolve_local_reference:(NSString *)json
 {
-    DTLogInfo (@"Resolving Local References");
+    DTLogInfo (@"Local Reference Mixin");
+    DTLogDebug (@"Resolving Local References For Json %@", json);
 
     // Local - convert "@": "$document.blah.blah" to "{{#include $root.$document.blah.blah}}": {}
     NSError * error;
@@ -1547,19 +1651,27 @@
                                                      options:kNilOptions
                                                        range:NSMakeRange (0, json.length)
                                                 withTemplate:@"\"{{#include \\$root.$1}}\": {}"];
-
+    
+    
     id tpl = [JasonHelper objectify:converted];
 
     NSMutableDictionary * refs = [VC.requires mutableCopy];
 
+    
     refs[@"$document"] = VC.original;
+    
+    DTLogDebug(@"TPL %@ Refs", tpl, refs);
 
     id include_resolved = [JasonParser parse:refs with:tpl];
+
     VC.original = include_resolved;
+    
+    DTLogDebug(@"Resolved References %@", include_resolved);
 
     return include_resolved;
 }
 
+#pragma mark - Lifecycle
 - (Jason *)detach:(JasonViewController *)viewController
 {
     // Need to clean up before leaving the view
@@ -1609,12 +1721,12 @@
             DTLogDebug (@"$webcontainer found");
 
             if (VC.isMovingFromParentViewController || VC.isBeingDismissed) {
-            // Web container AND coming back from the child view therefore it's ok to kill the child view's web container agent
+                // Web container AND coming back from the child view therefore it's ok to kill the child view's web container agent
                 DTLogDebug (@"Web container AND coming back from the child view therefore it's ok to kill the child view's web container agent");
                 [agent clear:key forVC:VC];
             } else {
-            // Otherwise it could be:
-            // 1. Going from view A to view B (Don't kill view A's agent)
+                // Otherwise it could be:
+                // 1. Going from view A to view B (Don't kill view A's agent)
                 DTLogDebug (@"Going from view A to view B (Don't kill view A's agent)");
                 DTLogDebug (@"Not clearing $webcontainer");
             }
@@ -1690,7 +1802,7 @@
         header_needs_refresh = YES;
 
         if (VC.rendered[@"nav"]) {
-        // Deprecated
+            // Deprecated
             [self setupHeader:VC.rendered[@"nav"]];
         } else if (VC.rendered[@"header"]) {
             [self setupHeader:VC.rendered[@"header"]];
@@ -1734,16 +1846,16 @@
          *
          ********************************************************************************************************/
         if (VC.rendered && rendered_page) {
-        /*********************************************************************************************************
-         *
-         * We need to redraw the already rendered final result instead of the pre-rendered markup
-         *
-         * For example, in: {"head": {"title": "{{$params.name}}", ...}}
-         * It will draw "{{$params.name}}" as the title of the nav bar if we don't draw from the already rendered markup.
-         *
-         ********************************************************************************************************/
+            /*********************************************************************************************************
+             *
+             * We need to redraw the already rendered final result instead of the pre-rendered markup
+             *
+             * For example, in: {"head": {"title": "{{$params.name}}", ...}}
+             * It will draw "{{$params.name}}" as the title of the nav bar if we don't draw from the already rendered markup.
+             *
+             ********************************************************************************************************/
             if (VC.rendered[@"nav"]) {
-        // Deprecated
+                // Deprecated
                 [self setupHeader:VC.rendered[@"nav"]];
             } else if (VC.rendered[@"header"]) {
                 [self setupHeader:VC.rendered[@"header"]];
@@ -1761,11 +1873,11 @@
 
             if (VC.rendered[@"footer"] && VC.rendered[@"footer"][@"tabs"]) {
                 if (![old_tabs isEqualToDictionary:VC.rendered[@"footer"][@"tabs"]]) {
-            // Use this
+                    // Use this
                     [self setupTabBar:VC.rendered[@"footer"][@"tabs"]];
                 }
             } else {
-            // Deprecated
+                // Deprecated
                 if (![old_tabs isEqualToDictionary:VC.rendered[@"tabs"]]) {
                     [self setupTabBar:VC.rendered[@"tabs"]];
                 }
@@ -1798,12 +1910,12 @@
                 }
             }
 
-        // set "rendered_page" to VC.rendered for cases when we're coming back from another view
-        // so that rendered_page will be always in sync even when there is no $show handler to refresh the view.
+            // set "rendered_page" to VC.rendered for cases when we're coming back from another view
+            // so that rendered_page will be always in sync even when there is no $show handler to refresh the view.
 
             rendered_page = VC.rendered;
 
-        // if the view gets updated inside onShow, the rendered_page will update automatically
+            // if the view gets updated inside onShow, the rendered_page will update automatically
             [self onShow];
         }
         /*********************************************************************************************************
@@ -1812,25 +1924,25 @@
          *
          ********************************************************************************************************/
         else {
-        /*********************************************************************************************************
-         *
-         * If content has been loaded already,
-         *  1. redraw navbar
-         *  2. re-setup event listener
-         *
-         ********************************************************************************************************/
+            /*********************************************************************************************************
+             *
+             * If content has been loaded already,
+             *  1. redraw navbar
+             *  2. re-setup event listener
+             *
+             ********************************************************************************************************/
             if (VC.contentLoaded) {
-        // If content already loaded,
-        // 1. just setup the navbar so the navbar will have the correct style
-        // 2. trigger load events ($show or $load)
+                // If content already loaded,
+                // 1. just setup the navbar so the navbar will have the correct style
+                // 2. trigger load events ($show or $load)
                 [self setupHeader:VC.nav];
                 [self onShow];
             }
-        /*********************************************************************************************************
-         *
-         * If content has not been loaded yet, do a fresh reload
-         *
-         ********************************************************************************************************/
+            /*********************************************************************************************************
+             *
+             * If content has not been loaded yet, do a fresh reload
+             *
+             ********************************************************************************************************/
             else {
                 if (VC.preload && VC.preload[@"style"] && VC.preload[@"style"][@"background"]) {
                     if ([VC.preload[@"style"][@"background"] isKindOfClass:[NSDictionary class]]) {
@@ -1979,14 +2091,25 @@
     NSDictionary * info = [[NSBundle mainBundle] infoDictionary];
     NSString * version = [info objectForKey:@"CFBundleShortVersionString"];
     NSString * build = [info objectForKey:(NSString *)kCFBundleVersionKey];
+
     dict[@"app"] = @{ @"build": build, @"version": version };
 
     CGRect bounds = [[UIScreen mainScreen] bounds];
+
     dict[@"device"] = @{
-            @"width": @(bounds.size.width),
-            @"height": @(bounds.size.height),
-            @"os": @{ @"name": @"ios", @"version": [[UIDevice currentDevice] systemVersion] },
-            @"language": [[NSLocale preferredLanguages] objectAtIndex:0]
+        @"uuid": [[[UIDevice currentDevice] identifierForVendor] UUIDString],
+        @"width": @(bounds.size.width),
+        @"height": @(bounds.size.height),
+        @"os": @{
+            @"name": [[[UIDevice currentDevice] systemName] lowercaseString],
+            @"version": [[UIDevice currentDevice] systemVersion]
+        },
+        @"name": [[UIDevice currentDevice] name],
+        @"model": @{
+            @"name": [[UIDevice currentDevice] model],
+            @"localized": [[UIDevice currentDevice] localizedModel]
+        },
+        @"language": [[NSLocale preferredLanguages] objectAtIndex:0]
     };
 
     NSURLComponents * components = [NSURLComponents componentsWithString:self->VC.url];
@@ -1999,8 +2122,8 @@
     }
 
     dict[@"view"] = @{
-            @"url": self->VC.url,
-            @"params": params
+        @"url": self->VC.url,
+        @"params": params
     };
 
     return dict;
@@ -2055,6 +2178,7 @@
     }
 
     NSDictionary * env = [self getEnv];
+
     data_stub[@"$env"] = env;
 
     if (self->VC.current_cache) {
@@ -2226,7 +2350,7 @@
          * Handling data uri
          ***************************************************/
         if ([self->VC.url hasPrefix:@"data:application/json"]) {
-        // if data uri, parse it into NSData
+            // if data uri, parse it into NSData
             NSURL * url = [NSURL URLWithString:self->VC.url];
             NSData * jsonData = [NSData dataWithContentsOfURL:url];
             NSError * error;
@@ -2251,7 +2375,7 @@
             AFJSONResponseSerializer * jsonResponseSerializer = [JasonNetworking serializer];
             NSMutableSet * jsonAcceptableContentTypes = [NSMutableSet setWithSet:jsonResponseSerializer.acceptableContentTypes];
 
-        // Assumes that content type is json, even the text/plain ones (Some hosting sites respond with data_type of text/plain even when it's actually a json, so we accept even text/plain as json by default)
+            // Assumes that content type is json, even the text/plain ones (Some hosting sites respond with data_type of text/plain even when it's actually a json, so we accept even text/plain as json by default)
 
             [jsonAcceptableContentTypes addObject:@"text/plain"];
             [jsonAcceptableContentTypes addObject:@"text/html"];
@@ -2276,40 +2400,40 @@
                   progress:^(NSProgress * _Nonnull downloadProgress) { }
                    success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject) {
                        // Ignore if the url is different
-                       if (![JasonHelper  isURL:task.originalRequest.URL
-                            equivalentTo      :self->VC.url]) {
-                       return;
+                       if (![JasonHelper isURL:task.originalRequest.URL
+                                equivalentTo      :self->VC.url]) {
+                         return;
                        }
 
                        self->VC.original = responseObject;
 
                        [self include:responseObject
-                                         andCompletionHandler:^(id res)
-                {
-                    dispatch_async (dispatch_get_main_queue (), ^{
-                                        self->VC.contentLoaded = NO;
+                                          andCompletionHandler:^(id res)
+                                              {
+                                              dispatch_async (dispatch_get_main_queue (), ^{
+                                              self->VC.contentLoaded = NO;
 
-                                        self->VC.original = @{ @"$jason": res[@"$jason"] };
-                                        [self drawViewFromJason:self->VC.original
-                                                        asFinal:YES];
-                                    });
+                                              self->VC.original = @{ @"$jason": res[@"$jason"] };
+                                              [self drawViewFromJason:self->VC.original
+                                                              asFinal:YES];
+                                              });
                        }];
                    }
                    failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error)
-            {
-                if (!self->VC.offline) {
-                    DTLogWarning (@"%@", error);
-                    [[Jason client] loadViewByFile:@"file://error.json"
-                                           asFinal:YES];
-                    [[Jason client] call:@{
-                         @"type": @"$util.alert",
-                         @"options": @{
-                             @"title": @"Debug",
-                             @"description": [error localizedDescription]
-                         }
-                    }];
-                }
-            }];
+                       {
+                       if (!self->VC.offline) {
+                         DTLogWarning (@"%@", error);
+                         [[Jason client] loadViewByFile:@"file://error.json"
+                                                asFinal:YES];
+                         [[Jason client] call:@{
+                              @"type": @"$util.alert",
+                              @"options": @{
+                                  @"title": @"Debug",
+                                  @"description": [error localizedDescription]
+                              }
+                         }];
+                       }
+                   }];
         }
     }
 }
@@ -2353,28 +2477,28 @@
 
         if (body) {
             if (body[@"nav"]) {
-        // Deprecated
+                // Deprecated
                 [self setupHeader:body[@"nav"]];
             } else if (body[@"header"]) {
-        // Use this
+                // Use this
                 [self setupHeader:body[@"header"]];
             } else {
                 [self setupHeader:nil];
             }
 
             if (body[@"footer"] && body[@"footer"][@"tabs"]) {
-        // Use this
+                // Use this
                 [self setupTabBar:body[@"footer"][@"tabs"]];
             } else {
-        // Deprecated
+                // Deprecated
                 [self setupTabBar:body[@"tabs"]];
             }
 
-        // By default, "body" is the markup that will be rendered
+            // By default, "body" is the markup that will be rendered
             rendered_page = dom[@"body"];
         } else {
-        // Don't remove the header and footer even if it doesn't exist yet
-        // and let it be overridden in $render
+            // Don't remove the header and footer even if it doesn't exist yet
+            // and let it be overridden in $render
         }
 
         /****************************************************************************
@@ -2387,7 +2511,7 @@
             NSDictionary * body_parser = VC.parser[@"body"];
 
             if (body_parser) {
-        // parse the data with the template to dynamically build the view
+                // parse the data with the template to dynamically build the view
                 NSMutableDictionary * data_stub;
 
                 if (VC.data) {
@@ -2409,21 +2533,21 @@
 
             if (rendered_page[@"style"] && rendered_page[@"style"][@"background"]) {
                 if ([rendered_page[@"style"][@"background"] isKindOfClass:[NSDictionary class]]) {
-            // Advanced background
-            // example:
-            //  "background": {
-            //      "type": "camera",
-            //      "options": {
-            //          ...
-            //      }
-            //  }
+                    // Advanced background
+                    // example:
+                    //  "background": {
+                    //      "type": "camera",
+                    //      "options": {
+                    //          ...
+                    //      }
+                    //  }
                     [self drawAdvancedBackground:rendered_page[@"style"][@"background"]];
                 } else {
                     [self drawBackground:rendered_page[@"style"][@"background"]];
                 }
             } else if (rendered_page[@"background"]) {
                 if ([rendered_page[@"background"] isKindOfClass:[NSDictionary class]]) {
-            // Advanced background
+                    // Advanced background
                     DTLogDebug (@"Detected Advanced Background");
                     [self drawAdvancedBackground:rendered_page[@"background"]];
                 } else {
@@ -2539,6 +2663,10 @@
 
             if (bg[@"com.jasonelle.state:stop-reloading"]) {
                 payload[@"com.jasonelle.state:stop-reloading"] = @YES;
+            }
+
+            if (bg[@"options"]) {
+                payload[@"options"] = bg[@"options"];
             }
 
             DTLogDebug (@"Loading Background with Payload %@", payload);
@@ -2807,7 +2935,7 @@
 
         // 3. agents
         if (!VC.agentReady) {
-        // Agents must be setup ONLY once, AFTER the true view has finished loading.
+            // Agents must be setup ONLY once, AFTER the true view has finished loading.
             if (head[@"agents"] && [head[@"agents"] isKindOfClass:[NSDictionary class]] && [head[@"agents"] count] > 0) {
                 for (NSString * key in head[@"agents"]) {
                     JasonAgentService * agent = self.services[@"JasonAgentService"];
@@ -2851,7 +2979,7 @@
             if (v.old_header && [[v.old_header description] isEqualToString:[nav description]]) {
                 // if the header is the same as the value trying to set,
                 if (rendered_page[@"header"] && [[rendered_page[@"header"] description] isEqualToString:[v.old_header description]]) {
-                // and if the currently visible rendered_page's header is the same as the VC's old_header, ignore.
+                    // and if the currently visible rendered_page's header is the same as the VC's old_header, ignore.
                     return;
                 }
             }
@@ -2897,10 +3025,10 @@
             navigationController.navigationBar.barTintColor = background;
             navigationController.navigationBar.tintColor = color;
             navigationController.navigationBar.titleTextAttributes = @{
-                    NSForegroundColorAttributeName: color,
-                    NSFontAttributeName: [UIFont
-                                          fontWithName:@"HelveticaNeue-CondensedBold"
-                                                  size:18.0]
+                NSForegroundColorAttributeName: color,
+                NSFontAttributeName: [UIFont
+                                      fontWithName:@"HelveticaNeue-CondensedBold"
+                                              size:18.0]
             };
             return;
         }
@@ -2908,10 +3036,10 @@
 
     navigationController.navigationBar.barStyle = UIStatusBarStyleLightContent;
     navigationController.navigationBar.titleTextAttributes = @{
-            NSForegroundColorAttributeName: color,
-            NSFontAttributeName: [UIFont
-                                  fontWithName:@"HelveticaNeue-CondensedBold"
-                                          size:18.0]
+        NSForegroundColorAttributeName: color,
+        NSFontAttributeName: [UIFont
+                              fontWithName:@"HelveticaNeue-CondensedBold"
+                                      size:18.0]
     };
     navigationController.navigationBar.hidden = NO;
 
@@ -2974,10 +3102,10 @@
         }
 
         navigationController.navigationBar.titleTextAttributes = @{
-                NSForegroundColorAttributeName: color,
-                NSFontAttributeName: [UIFont
-                                      fontWithName:font_name
-                                              size:[font_size integerValue]]
+            NSForegroundColorAttributeName: color,
+            NSFontAttributeName: [UIFont
+                                  fontWithName:font_name
+                                          size:[font_size integerValue]]
         };
     } else {
         navigationController.navigationBar.barStyle = UIStatusBarStyleLightContent;
@@ -2985,10 +3113,10 @@
         NSString * font_name = @"HelveticaNeue-CondensedBold";
         NSString * font_size = @"18";
         navigationController.navigationBar.titleTextAttributes = @{
-                NSForegroundColorAttributeName: color,
-                NSFontAttributeName: [UIFont
-                                      fontWithName:font_name
-                                              size:[font_size integerValue]]
+            NSForegroundColorAttributeName: color,
+            NSFontAttributeName: [UIFont
+                                  fontWithName:font_name
+                                          size:[font_size integerValue]]
         };
     }
 
@@ -3072,11 +3200,11 @@
                                          }
                                         completed:^(UIImage * image, NSError * error, SDImageCacheType cacheType, BOOL finished, NSURL * imageURL) {
                                             if (image) {
-                                            dispatch_async (dispatch_get_main_queue (), ^{
-                                                [self setMenuButtonImage:image
-                                                               forButton:btn
-                                                                withMenu:left_menu];                                 //
-                                            });
+                                                dispatch_async (dispatch_get_main_queue (), ^{
+                                                                    [self setMenuButtonImage:image
+                                                                                   forButton:btn
+                                                                                    withMenu:left_menu];             //
+                                                                });
                                             }
                                         }];
                 }
@@ -3145,11 +3273,11 @@
                                          }
                                         completed:^(UIImage * image, NSError * error, SDImageCacheType cacheType, BOOL finished, NSURL * imageURL) {
                                             if (image) {
-                                            dispatch_async (dispatch_get_main_queue (), ^{
-                                                [self setMenuButtonImage:image
-                                                               forButton:btn
-                                                                withMenu:right_menu];
-                                            });
+                                                dispatch_async (dispatch_get_main_queue (), ^{
+                                                                    [self setMenuButtonImage:image
+                                                                                   forButton:btn
+                                                                                    withMenu:right_menu];
+                                                                });
                                             }
                                         }];
                 }
@@ -3199,11 +3327,11 @@
                                                      }
                                                     completed:^(UIImage * image, NSError * error, SDImageCacheType cacheType, BOOL finished, NSURL * imageURL) {
                                                         if (image) {
-                                                        dispatch_async (dispatch_get_main_queue (), ^{
-                                                            [self setLogoImage:image
-                                                                     withStyle:style
-                                                                         forVC:v];
-                                                        });
+                                                            dispatch_async (dispatch_get_main_queue (), ^{
+                                                                                [self setLogoImage:image
+                                                                                         withStyle:style
+                                                                                             forVC:v];
+                                                                            });
                                                         }
                                                     }];
                             }
@@ -3337,6 +3465,7 @@
 
     UIView * logoView = [[UIView alloc] initWithFrame:frame];
     UIImageView * logoImageView = [[UIImageView alloc] initWithImage:image];
+
     logoImageView.frame = frame;
 
     [logoView addSubview:logoImageView];
@@ -3386,7 +3515,7 @@
             }
         }
 
-        if (badge[@"text"]) {
+        if (badge[@"text"] && ![[badge[@"text"] description] isEqualToString:@""]) {
             barButton.badgeValue = [badge[@"text"] description];
         } else {
             barButton.badgeValue = @" ";
@@ -3579,14 +3708,14 @@
                 if (firstTime) {
                     // First time loading
                     if (i == indexOfTab) {
-                    // for the current tab, simply add the navigationcontrolle to the tabs array
-                    // no need to create a new VC, etc. because it's already been instantiated
+                        // for the current tab, simply add the navigationcontrolle to the tabs array
+                        // no need to create a new VC, etc. because it's already been instantiated
                         tabFound = YES;
-                    // if the tab URL is same as the currently visible VC's url
+                        // if the tab URL is same as the currently visible VC's url
                         self->VC.tabNeedsRefresh = YES;
                         [tabs_array addObject:self->navigationController];
                     } else {
-                    // for all other tabs, create a new VC and instantiate them, and add them to the tabs array
+                        // for all other tabs, create a new VC and instantiate them, and add them to the tabs array
                         JasonViewController * vc = [[JasonViewController alloc] init];
                         vc.url = url;
 
@@ -3604,7 +3733,7 @@
                     // If it's not the first time (the tab bars are already visible)
                     // check the URLs and update if changed.
                     if ([v.url isEqualToString:url]) {
-                    // Do nothing
+                        // Do nothing
                         v.tabNeedsRefresh = YES;
                         tabFound = YES;
                     } else {
@@ -3690,7 +3819,11 @@
 
             if (self->VC.tabNeedsRefresh) {
                 DTLogDebug (@"Tab %ld Needs Refresh", indexOfTab);
-                [[Jason client] call:@{ @"type": @"$reload" }];
+                [((UINavigationController *)viewController) popToRootViewControllerAnimated:NO];
+                self->VC = ((UINavigationController *)viewController).viewControllers.lastObject;
+                self->VC.url = href;
+                [self->VC reload:nil final:NO];
+                [[Jason client] call:@{ @"type": @"$render" }];
                 return YES;
                 /* This code contains the logic to refresh.
                  * the problem is that refreshing more than one time
@@ -3779,9 +3912,9 @@
                                  }
                                 completed:^(UIImage * i, NSError * error, SDImageCacheType cacheType, BOOL finished, NSURL * imageURL) {
                                     if (i) {
-                                    [self setTabImage:i
-                                    withTab:tab
-                                    andItem:item];
+                                        [self setTabImage:i
+                                                  withTab:tab
+                                                  andItem:item];
                                     }
                                 }];
         }
@@ -3789,7 +3922,7 @@
         [item setTitlePositionAdjustment:UIOffsetMake (0.0, -18.0)];
     }
 
-    if (tab[@"badge"]) {
+    if (tab[@"badge"] && ![[tab[@"badge"] description] isEqualToString:@""]) {
         [item setBadgeValue:[tab[@"badge"] description]];
     }
 }
@@ -3816,6 +3949,7 @@
     }
 
     UIImage * newImage = [JasonHelper scaleImage:image ToSize:CGSizeMake (width, height)];
+
     dispatch_async (dispatch_get_main_queue (), ^{
         [item setImage:newImage];
     });
@@ -3947,14 +4081,14 @@
             CGRect frame = [UIScreen mainScreen].bounds;
 
             NSDictionary * params = @{
-                    @"$jason": @{
-                        @"id": @(device.orientation),
-                        @"portrait": @(UIDeviceOrientationIsPortrait (device.orientation)),
-                        @"size": @{
-                            @"width": @(frame.size.width),
-                            @"height": @(frame.size.height)
-                        }
+                @"$jason": @{
+                    @"id": @(device.orientation),
+                    @"portrait": @(UIDeviceOrientationIsPortrait (device.orientation)),
+                    @"size": @{
+                        @"width": @(frame.size.width),
+                        @"height": @(frame.size.height)
                     }
+                }
             };
 
             DTLogInfo (@"Calling $orientation.changed event %@", params);
@@ -3966,6 +4100,14 @@
 # pragma mark - View Linking
 - (void)go:(NSDictionary *)href
 {
+    DTLogDebug (@"Go to href %@", href);
+
+    // Href should be a dictionary
+    if (![href respondsToSelector:@selector(objectForKey:)]) {
+        DTLogDebug (@"href is not a dictionary %@", href);
+        return;
+    }
+
     /*******************************
     *
     * Linking View to another View
@@ -4080,7 +4222,11 @@
 
                 DTLogDebug (@"openURL: %@", encodedUrl);
 
-                [[UIApplication sharedApplication] openURL:destination];
+                [[UIApplication sharedApplication] openURL:destination
+                                                   options:@{}
+                                         completionHandler:^(BOOL success) {
+                                             DTLogDebug (@"Openned %@", encodedUrl);
+                                         }];
             } else {
                 DTLogWarning (@"Invalid Url");
             }
@@ -4095,11 +4241,11 @@
 
                 if ([transition isEqualToString:@"replace"]) {
                     DTLogDebug (@"Replacing the current view");
-                /****************************************************************************
-                *
-                * Replace the current view
-                *
-                ****************************************************************************/
+                    /****************************************************************************
+                    *
+                    * Replace the current view
+                    *
+                    ****************************************************************************/
                     [self unlock];
 
                     if (href) {
@@ -4440,11 +4586,11 @@
         memory.executing = NO;
 
         if (memory._stack && memory._stack.count > 0) {
-        /****************************************************
-        * First, handle conditional cases
-        * If the stack contains an array, it must be a conditional. (#if)
-        # So run it through 'options' method to generate an actual stack
-        ****************************************************/
+            /****************************************************
+            * First, handle conditional cases
+            * If the stack contains an array, it must be a conditional. (#if)
+            # So run it through 'options' method to generate an actual stack
+            ****************************************************/
             if ([memory._stack isKindOfClass:[NSArray class]]) {
                 memory._stack = [self filloutTemplate:memory._stack withData:memory._register];
             }
@@ -4538,14 +4684,14 @@
                 DTLogDebug (@"Action Call by Type");
                 NSArray * tokens = [type componentsSeparatedByString:@"."];
 
-            // Jason Core actions: "METHOD" format => Within Jason.m
+                // Jason Core actions: "METHOD" format => Within Jason.m
                 if (tokens.count == 1) {
                     if (type.length > 1 && [type hasPrefix:@"$"]) {
                         NSString * actionName = [type substringFromIndex:1];
                         SEL method = NSSelectorFromString (actionName);
                         self.options = [self options];
 
-            // Set 'executing' to YES to prevent other actions from being accidentally executed concurrently
+                        // Set 'executing' to YES to prevent other actions from being accidentally executed concurrently
                         memory.executing = YES;
 
                         if ([self respondsToSelector:method]) {
@@ -4632,7 +4778,7 @@
                             } }];
                         }
                     } else {
-                // ignore error: "@ModuleName" -> missing action name
+                        // ignore error: "@ModuleName" -> missing action name
                         DTLogDebug (@"Missing Action Name");
                     }
                 }
@@ -4641,7 +4787,7 @@
                     DTLogDebug (@"$class.method format");
                     NSString * className = tokens[0];
 
-                // first take a look at the json file to resolve classname
+                    // first take a look at the json file to resolve classname
                     NSString * resourcePath = [[NSBundle mainBundle] resourcePath];
                     NSString * jrjson_filename = [NSString stringWithFormat:@"%@/%@.json", resourcePath, className];
                     NSFileManager * fileManager = [NSFileManager defaultManager];
@@ -4724,7 +4870,7 @@
 
                 // If the stack doesn't include any action to take after success, just finish
                 if (!memory._stack[@"success"] && !memory._stack[@"error"]) {
-                // VC.contentLoaded is NO if the action is $reload (until it returns)
+                    // VC.contentLoaded is NO if the action is $reload (until it returns)
                     if (VC.contentLoaded) {
                         [self finish];
                     }
@@ -4783,7 +4929,11 @@
     [JasonMemory client].locked = NO;
     [JasonMemory client].executing = NO;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"finishRefreshing" object:nil];
-    VC.view.userInteractionEnabled = YES;
+
+    dispatch_async (dispatch_get_main_queue (), ^{
+        self->VC.view.userInteractionEnabled = YES;
+    });
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"unlock" object:nil];
 
     // In case oauth was in process, set it back to No
@@ -4807,7 +4957,7 @@
     if (self->VC.original && self->VC.rendered && self->VC.original[@"$jason"][@"head"][@"offline"]) {
         DTLogInfo (@"Offline Mode Activated");
 
-        if (![[VC.rendered description] containsString:@"{{"] && ![[self.options description] containsString:@"}}"]) {
+        if (![[self->VC.rendered description] containsString:@"{{"] && ![[self.options description] containsString:@"}}"]) {
             dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
                 NSString * normalized_url = [JasonHelper normalized_url:self->VC.url forOptions:self->VC.options];
                 normalized_url = [normalized_url stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
@@ -4830,6 +4980,7 @@
 
     // if not offline, delete the file associated with the url
     NSString * normalized_url = [JasonHelper normalized_url:self->VC.url forOptions:self->VC.options];
+
     normalized_url = [normalized_url stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     NSArray * paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString * documentsDirectory = [paths objectAtIndex:0];

@@ -1,8 +1,8 @@
 {
   "name": "AFNetworking",
-  "version": "3.2.1",
+  "version": "4.0.1",
   "license": "MIT",
-  "summary": "A delightful iOS and OS X networking framework.",
+  "summary": "A delightful networking framework for Apple platforms.",
   "homepage": "https://github.com/AFNetworking/AFNetworking",
   "social_media_url": "https://twitter.com/AFNetworking",
   "authors": {
@@ -10,56 +10,52 @@
   },
   "source": {
     "git": "https://github.com/AFNetworking/AFNetworking.git",
-    "tag": "3.2.1",
-    "submodules": true
+    "tag": "4.0.1"
   },
-  "requires_arc": true,
-  "public_header_files": "AFNetworking/AFNetworking.h",
-  "source_files": "AFNetworking/AFNetworking.h",
-  "prefix_header_contents": "#ifndef TARGET_OS_IOS\n  #define TARGET_OS_IOS TARGET_OS_IPHONE\n#endif\n\n#ifndef TARGET_OS_WATCH\n  #define TARGET_OS_WATCH 0\n#endif\n\n#ifndef TARGET_OS_TV\n  #define TARGET_OS_TV 0\n#endif",
   "platforms": {
-    "ios": "8.0",
-    "osx": "10.9",
+    "ios": "9.0",
+    "osx": "10.10",
     "watchos": "2.0",
     "tvos": "9.0"
   },
+  "ios": {
+    "pod_target_xcconfig": {
+      "PRODUCT_BUNDLE_IDENTIFIER": "com.alamofire.AFNetworking"
+    }
+  },
+  "osx": {
+    "pod_target_xcconfig": {
+      "PRODUCT_BUNDLE_IDENTIFIER": "com.alamofire.AFNetworking"
+    }
+  },
+  "watchos": {
+    "pod_target_xcconfig": {
+      "PRODUCT_BUNDLE_IDENTIFIER": "com.alamofire.AFNetworking-watchOS"
+    }
+  },
+  "tvos": {
+    "pod_target_xcconfig": {
+      "PRODUCT_BUNDLE_IDENTIFIER": "com.alamofire.AFNetworking"
+    }
+  },
+  "source_files": "AFNetworking/AFNetworking.h",
   "subspecs": [
     {
       "name": "Serialization",
-      "source_files": "AFNetworking/AFURL{Request,Response}Serialization.{h,m}",
-      "public_header_files": "AFNetworking/AFURL{Request,Response}Serialization.h",
-      "watchos": {
-        "frameworks": [
-          "MobileCoreServices",
-          "CoreGraphics"
-        ]
-      },
-      "ios": {
-        "frameworks": [
-          "MobileCoreServices",
-          "CoreGraphics"
-        ]
-      },
-      "osx": {
-        "frameworks": "CoreServices"
-      }
+      "source_files": "AFNetworking/AFURL{Request,Response}Serialization.{h,m}"
     },
     {
       "name": "Security",
-      "source_files": "AFNetworking/AFSecurityPolicy.{h,m}",
-      "public_header_files": "AFNetworking/AFSecurityPolicy.h",
-      "frameworks": "Security"
+      "source_files": "AFNetworking/AFSecurityPolicy.{h,m}"
     },
     {
       "name": "Reachability",
       "platforms": {
-        "ios": "8.0",
-        "osx": "10.9",
+        "ios": "9.0",
+        "osx": "10.10",
         "tvos": "9.0"
       },
-      "source_files": "AFNetworking/AFNetworkReachabilityManager.{h,m}",
-      "public_header_files": "AFNetworking/AFNetworkReachabilityManager.h",
-      "frameworks": "SystemConfiguration"
+      "source_files": "AFNetworking/AFNetworkReachabilityManager.{h,m}"
     },
     {
       "name": "NSURLSession",
@@ -95,16 +91,12 @@
       "source_files": [
         "AFNetworking/AF{URL,HTTP}SessionManager.{h,m}",
         "AFNetworking/AFCompatibilityMacros.h"
-      ],
-      "public_header_files": [
-        "AFNetworking/AF{URL,HTTP}SessionManager.h",
-        "AFNetworking/AFCompatibilityMacros.h"
       ]
     },
     {
       "name": "UIKit",
       "platforms": {
-        "ios": "8.0",
+        "ios": "9.0",
         "tvos": "9.0"
       },
       "dependencies": {
@@ -112,7 +104,6 @@
 
         ]
       },
-      "public_header_files": "UIKit+AFNetworking/*.h",
       "source_files": "UIKit+AFNetworking"
     }
   ]

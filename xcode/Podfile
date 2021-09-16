@@ -1,11 +1,11 @@
-platform :ios, '9.0'
-#inhibit_all_warnings!
+platform :ios, '12.0'
+inhibit_all_warnings!
 use_frameworks!
 
 target 'Jasonette' do
 
   # System
-  pod 'UICKeyChainStore', :git => 'https://github.com/jasonelle/ios-pod-uickeychainstore.git', :branch => 'jasonelle'
+  pod 'UICKeyChainStore', :git => 'https://github.com/jasonelle/ios-pod-uickeychainstore.git', :branch => 'jasonelle', :inhibit_warnings => true
   pod 'libPhoneNumber-iOS', :git => 'https://github.com/jasonelle/ios-pod-libphonenumber.git', :branch => 'jasonelle'
   pod 'DTFoundation', :git => 'https://github.com/jasonelle/ios-pod-dtfoundation.git', :branch => 'jasonelle'
   pod 'DTCoreText', :git => 'https://github.com/jasonelle/ios-pod-dtcoretext.git', :branch => 'jasonelle'
@@ -25,14 +25,14 @@ target 'Jasonette' do
   pod 'SocketRocket', :git => 'https://github.com/jasonelle/ios-pod-socketrocket.git', :branch => 'jasonelle'
   pod 'AFNetworking', :git => 'https://github.com/jasonelle/ios-pod-afnetworking.git', :branch => 'jasonelle'
   pod 'TDOAuth'
-  pod 'AFOAuth2Manager'
+  pod 'AFOAuth2Manager', :git => 'https://github.com/jasonelle/ios-pod-afoauth2manager.git', :branch => 'jasonelle'
 
   ## TODO: Update to latest version
-  pod 'SDWebImage', :git => 'https://github.com/jasonelle/ios-pod-sdwebimage.git', :tag => '3.8.1', :inhibit_warnings => true
+  pod 'SDWebImage', :git => 'https://github.com/jasonelle/ios-pod-sdwebimage.git', :tag => '3.8.3', :inhibit_warnings => true
   
   # Audio
   pod 'IQAudioRecorderController'
-  pod 'FreeStreamer', :git => 'https://github.com/jasonelle/ios-pod-freestreamer.git', :branch => 'jasonelle'
+  pod 'FreeStreamer', :git => 'https://github.com/jasonelle/ios-pod-freestreamer.git', :branch => 'jasonelle', :inhibit_warnings => true
   
   # Views
   pod 'MBProgressHUD', '~> 1.0'
@@ -46,7 +46,7 @@ target 'Jasonette' do
   pod 'BBBadgeBarButtonItem'
   
   pod 'REMenu', :git => 'https://github.com/jasonelle/ios-pod-remenu.git', :branch => 'jasonelle'
-  pod 'JDStatusBarNotification' # $util.toast
+  pod 'JDStatusBarNotification', :git => 'https://github.com/jasonelle/ios-pod-jdstatusbarnotification.git', :inhibit_warnings => true # $util.toast
   pod 'HMSegmentedControl', :git => 'https://github.com/jasonelle/ios-pod-hmsegmentedcontrol.git', :branch => 'jasonelle'
   pod 'SWFrameButton'
   

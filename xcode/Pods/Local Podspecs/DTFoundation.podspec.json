@@ -180,7 +180,7 @@
       },
       "ios": {
         "frameworks": [
-          "MobileCoreServices"
+          "CoreServices"
         ]
       },
       "source_files": "Core/Source/DTUTI/*.{h,m}"

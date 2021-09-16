@@ -10,6 +10,7 @@
 #import "UICKeyChainStore.h"
 #import "JasonParser.h"
 @interface JasonHelper : NSObject
+        NS_ASSUME_NONNULL_BEGIN
 + (NSDate *)dateWithISO8601String:(NSString *)dateString;
 + (NSDate *)dateFromString:(NSString *)dateString withFormat:(NSString *)dateFormat;
 + (MFMessageComposeViewController *)sendSMS:(NSString *)message to:(NSString *)phone;
@@ -48,5 +49,6 @@
 + (id)getPlistSettings:(NSString *)key;
 
 + (id)                              loadErrorJson;
-+ (nullable NSDictionary *) hjson_to_json: (nonnull NSString *) content;
++ (nullable NSDictionary *)hjson_to_json:(nonnull NSString *)content;
+NS_ASSUME_NONNULL_END
 @end

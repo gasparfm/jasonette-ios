@@ -16,6 +16,7 @@
 
     // Map Style
     NSDictionary * style = json[@"style"];
+
     component.mapType = MKMapTypeStandard;
 
     if (style && style[@"type"]) {
@@ -119,6 +120,7 @@
     }
 
     MKAnnotationView * annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"location"];
+
     annotationView.canShowCallout = YES;
     annotationView.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
 

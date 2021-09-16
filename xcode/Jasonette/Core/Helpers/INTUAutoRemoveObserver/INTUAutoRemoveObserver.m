@@ -34,7 +34,7 @@
 @property (nonatomic, unsafe_unretained) id notificationObserver;
 
 @property (nonatomic, assign) id notificationSender;
-@property (nonatomic, copy) NSString* notificationName;
+@property (nonatomic, copy) NSString * notificationName;
 
 // This is to store a reference to any block created observer
 @property (nonatomic, strong) id blockObserver;
@@ -43,52 +43,51 @@
 
 @implementation INTUAutoRemoveObserver
 
-+(void)addObserver:(id)notificationObserver selector:(SEL)notificationSelector name:(NSString *)notificationName object:(id)notificationSender
++ (void)addObserver:(id)notificationObserver selector:(SEL)notificationSelector name:(NSString *)notificationName object:(id)notificationSender
 {
-	// Create the remover object
-	INTUAutoRemoveObserver* remover = [[INTUAutoRemoveObserver alloc] init];
-	remover.notificationObserver = notificationObserver;
-	remover.notificationName = notificationName;
-	remover.notificationSender = notificationSender;
-	
-	// Keep this object around for the lifetime of the observer
-	objc_setAssociatedObject(notificationObserver, (__bridge const void *)(remover), remover, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	
-	// Now register for the notification
-	[[NSNotificationCenter defaultCenter] addObserver:notificationObserver
-											 selector:notificationSelector
-												 name:notificationName
-											   object:notificationSender];
+    // Create the remover object
+    INTUAutoRemoveObserver * remover = [[INTUAutoRemoveObserver alloc] init];
+
+    remover.notificationObserver = notificationObserver;
+    remover.notificationName = notificationName;
+    remover.notificationSender = notificationSender;
+
+    // Keep this object around for the lifetime of the observer
+    objc_setAssociatedObject (notificationObserver, (__bridge const void *)(remover), remover, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+
+    // Now register for the notification
+    [[NSNotificationCenter defaultCenter] addObserver:notificationObserver
+                                             selector:notificationSelector
+                                                 name:notificationName
+                                               object:notificationSender];
 }
 
-+(void)addObserver:(id)notificationObserver forName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification *))block;
-{
-	// Create the remover object
-	INTUAutoRemoveObserver* remover = [[INTUAutoRemoveObserver alloc] init];
-	
-	id blockObserver = [[NSNotificationCenter defaultCenter] addObserverForName:name
-																		 object:obj
-																		  queue:queue
-																	 usingBlock:block];
-	
-	// Keep this object around for the lifetime of the notificationObserver object
-	objc_setAssociatedObject(notificationObserver, (__bridge const void *)(remover), remover, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	
-	remover.blockObserver = blockObserver;
++ (void)addObserver:(id)notificationObserver forName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification *))block; {
+    // Create the remover object
+    INTUAutoRemoveObserver * remover = [[INTUAutoRemoveObserver alloc] init];
+
+    id blockObserver = [[NSNotificationCenter defaultCenter] addObserverForName:name
+                                                                         object:obj
+                                                                          queue:queue
+                                                                     usingBlock:block];
+
+    // Keep this object around for the lifetime of the notificationObserver object
+    objc_setAssociatedObject (notificationObserver, (__bridge const void *)(remover), remover, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+
+    remover.blockObserver = blockObserver;
 }
 
--(void)dealloc
+- (void)dealloc
 {
-	if ( self.blockObserver ) {
-		// A block based notification center observer
-		[[NSNotificationCenter defaultCenter] removeObserver:self.blockObserver];
-	}
-	else {
-		// A selector based notification center observer
-		[[NSNotificationCenter defaultCenter] removeObserver:self.notificationObserver
-														name:self.notificationName
-													  object:self.notificationSender];
-	}
+    if (self.blockObserver) {
+        // A block based notification center observer
+        [[NSNotificationCenter defaultCenter] removeObserver:self.blockObserver];
+    } else {
+        // A selector based notification center observer
+        [[NSNotificationCenter defaultCenter] removeObserver:self.notificationObserver
+                                                        name:self.notificationName
+                                                      object:self.notificationSender];
+    }
 }
 
 @end

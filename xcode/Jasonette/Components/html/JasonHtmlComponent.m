@@ -10,27 +10,24 @@
 
 @implementation JasonHtmlComponent
 + (UIView *)build:(WKWebView *)component withJSON:(NSDictionary *)json withOptions:(NSDictionary *)options {
-    
     if (!component) {
-        
         WKWebViewConfiguration * config = [[WKWebViewConfiguration alloc] init];
-        
+
         [config setAllowsInlineMediaPlayback:YES];
-        
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        
+
         if ([config respondsToSelector:@selector(setMediaPlaybackRequiresUserAction:)]) {
             [config setMediaPlaybackRequiresUserAction:NO];
         }
-        
+
 #pragma clang diagnostic pop
-        
+
         if (@available(iOS 10, *)) {
             [config setMediaTypesRequiringUserActionForPlayback:WKAudiovisualMediaTypeNone];
         }
-        
-        
+
         CGFloat width = [[UIScreen mainScreen] bounds].size.width;
         CGFloat height = [[UIScreen mainScreen] bounds].size.height;
 
@@ -43,21 +40,20 @@
                 height = [JasonHelper pixelsInDirection:@"vertical" fromExpression:json[@"style"][@"height"]];
             }
         }
-        
-       
+
         // TODO: Figure it out what this does
         NSString * summon = @"var JASON={call: function(e){var n=document.createElement(\"IFRAME\");n.setAttribute(\"src\",\"jason:\"+JSON.stringify(e)),document.documentElement.appendChild(n),n.parentNode.removeChild(n),n=null}};";
-        
+
         WKUserScript * summonScript = [[WKUserScript alloc] initWithSource:summon injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
-        
+
         WKUserContentController * controller = [WKUserContentController new];
         [controller addUserScript:summonScript];
 
         config.userContentController = controller;
-        
+
         CGRect frame = CGRectMake (0, 0, width, height);
         component = [[WKWebView alloc] initWithFrame:frame configuration:config];
-        
+
         component.translatesAutoresizingMaskIntoConstraints = NO;
         component.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
         component.navigationDelegate = [self self];
@@ -67,39 +63,35 @@
     component.backgroundColor = [UIColor clearColor];
 
     if (json[@"text"] && ![[NSNull null] isEqual:json[@"text"]]) {
-        
         // Remember to add <meta name='viewport' content='width=device-width, initial-scale=1.0'>
         // if you want to display properly
         NSString * html = [json[@"text"] description];
         NSString * lowerCaseHtml = [html lowercaseString];
-        
-        if(![lowerCaseHtml containsString:@"viewport"] && ![lowerCaseHtml
-             containsString:@"initial-scale"])
-        {
-            DTLogWarning(@"html <meta name='viewport'> not found. Display could be not properly rendered in html component. Forcing initial-scale=1.0.");
-            
-            NSRange headRange = [[html lowercaseString] rangeOfString:@"<head>"];
-            DTLogDebug(@"Range location %d length %d", headRange.location, headRange.length);
 
-            if(headRange.location != NSNotFound) {
-                
+        if (![lowerCaseHtml containsString:@"viewport"] && ![lowerCaseHtml
+                                                             containsString:@"initial-scale"]) {
+            DTLogWarning (@"html <meta name='viewport'> not found. Display could be not properly rendered in html component. Forcing initial-scale=1.0.");
+
+            NSRange headRange = [[html lowercaseString] rangeOfString:@"<head>"];
+            DTLogDebug (@"Range location %d length %d", headRange.location, headRange.length);
+
+            if (headRange.location != NSNotFound) {
                 NSString * head = [[html substringToIndex:headRange.location] stringByAppendingString:@"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"];
-                
-                DTLogDebug(@"Head", head);
-                
+
+                DTLogDebug (@"Head", head);
+
                 NSString * body = [html substringFromIndex:(headRange.location + @"<head>".length)];
-                
-                DTLogDebug(@"Body", body);
-                
+
+                DTLogDebug (@"Body", body);
+
                 html = [NSString stringWithFormat:@"%@%@", head, body];
             }
-            
         }
-        
-        DTLogDebug(@"Rendering HTML Component %@", html);
-        
+
+        DTLogDebug (@"Rendering HTML Component %@", html);
+
         [component loadHTMLString:html baseURL:nil];
-        
+
         component.scrollView.scrollEnabled = NO;
 
         //component.delegate = [self self];
@@ -114,7 +106,6 @@
 
     // user interaction enable/disable => disabled by default
     component.userInteractionEnabled = NO;
-    
 
     if (json[@"action"]) {
         // if there's an 'action' attribute, delegate the event handling to this component
@@ -140,7 +131,7 @@
 }
 
 + (void)actionButtonClicked:(UIButton *)sender {
-    DTLogDebug(@"sender.payload = %@", sender.payload);
+    DTLogDebug (@"sender.payload = %@", sender.payload);
 
     if (sender.payload && sender.payload[@"action"]) {
         [[Jason client] call:sender.payload[@"action"]];

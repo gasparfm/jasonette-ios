@@ -21,14 +21,14 @@ static DTLogBlock _handler = nil;
     [JasonLogger setLogLevel:level];
 
     kLevelNames = @{
-            @(DTLogLevelDebug): @"DEBUG",
-            @(DTLogLevelInfo): @"INFO",
-            @(DTLogLevelAlert): @"ALERT",
-            @(DTLogLevelNotice): @"NOTICE",
-            @(DTLogLevelError): @"ERROR",
-            @(DTLogLevelWarning): @"WARNING",
-            @(DTLogLevelCritical): @"CRITICAL",
-            @(DTLogLevelEmergency): @"EMERGENCY"
+        @(DTLogLevelDebug): @"DEBUG",
+        @(DTLogLevelInfo): @"INFO",
+        @(DTLogLevelAlert): @"ALERT",
+        @(DTLogLevelNotice): @"NOTICE",
+        @(DTLogLevelError): @"ERROR",
+        @(DTLogLevelWarning): @"WARNING",
+        @(DTLogLevelCritical): @"CRITICAL",
+        @(DTLogLevelEmergency): @"EMERGENCY"
     };
 }
 

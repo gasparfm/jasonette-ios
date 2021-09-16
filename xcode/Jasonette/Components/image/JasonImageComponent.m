@@ -80,16 +80,16 @@
                          placeholderImage:placeholder_image
                                 completed:^(UIImage * i, NSError * error, SDImageCacheType cacheType, NSURL * imageURL) {
                                     if (!error) {
-                                    JasonComponentFactory.imageLoaded[url] = [NSValue valueWithCGSize:i.size];
+                                        JasonComponentFactory.imageLoaded[url] = [NSValue valueWithCGSize:i.size];
 
-                                    if (style[@"color"]) {
-                                    NSString * colorHex = style[@"color"];
-                                    UIColor * c = [JasonHelper colorwithHexString:colorHex
-                                                                alpha:1.0];
-                                    UIImage * image = [i imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                                    [component setTintColor:c];
-                                    [component setImage:image];
-                                    }
+                                        if (style[@"color"]) {
+                                            NSString * colorHex = style[@"color"];
+                                            UIColor * c = [JasonHelper colorwithHexString:colorHex
+                                                                                    alpha:1.0];
+                                            UIImage * image = [i imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                                            [component setTintColor:c];
+                                            [component setImage:image];
+                                        }
                                     }
                                 }];
         }
@@ -108,7 +108,7 @@
                 // don't do anything about the height, it will be handled in JasonComponent
             } else {
                 if (!style[@"height"]) {
-                // Width is set but height is not
+                    // Width is set but height is not
                     CGFloat aspectRatioMult;
 
                     if (JasonComponentFactory.imageLoaded[url]) {
@@ -139,7 +139,7 @@
                 // don't do anything about the width, it will be handled in JasonComponent
             } else {
                 if (!style[@"width"]) {
-                // Height is set but width is not
+                    // Height is set but width is not
                     CGFloat aspectRatioMult;
 
                     if (JasonComponentFactory.imageLoaded[url]) {

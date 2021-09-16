@@ -43,6 +43,8 @@
 	<string>used to access photo library</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>used to access location api</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Your reason, why you want to track the user</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

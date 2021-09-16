@@ -44,8 +44,8 @@
                       progress:^(NSProgress * _Nonnull downloadProgress) { }
                        success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject) {
                            NSString * js = [JasonHelper UTF8StringFromData:((NSData *)responseObject)];
-                           [self  inject:js
-                             into:context];
+                           [self inject:js
+                                 into:context];
                            dispatch_group_leave (requireGroup);
                        }
                        failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {

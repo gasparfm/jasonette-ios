@@ -106,14 +106,14 @@
                                      }
                                       success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject) {
                                           [self done:task
-                                          for:url
-                                          ofType:dataType
-                                          with:responseObject
+                                                    for:url
+                                                 ofType:dataType
+                                                   with:responseObject
                                              original_url:original_url];
                                       }
                                       failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                                           [weakSelf processError:error
-                                                withOriginalUrl:original_url];
+                                              withOriginalUrl  :original_url];
                                       }];
 
                 return;
@@ -126,14 +126,14 @@
                   }
                    success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject) {
                        [self done:task
-                             for:url
-                          ofType:dataType
-                            with:responseObject
+                                   for:url
+                                ofType:dataType
+                                  with:responseObject
                           original_url:original_url];
                    }
                    failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                        [weakSelf processError:error
-                             withOriginalUrl:original_url];
+                             withOriginalUrl  :original_url];
                    }];
         });
 
@@ -149,14 +149,14 @@
                    headers:nil
                    success:^(NSURLSessionDataTask * _Nonnull task, id _Nonnull responseObject) {
                        [self done:task
-                             for:url
-                          ofType:dataType
-                            with:responseObject
+                                  for:url
+                               ofType:dataType
+                                 with:responseObject
                           original_url:original_url];
                    }
                    failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                        [weakSelf processError:error
-                             withOriginalUrl:original_url];
+                            withOriginalUrl  :original_url];
                    }];
         });
         return;
@@ -171,14 +171,14 @@
                     headers:nil
                     success:^(NSURLSessionDataTask * _Nonnull task, id _Nonnull responseObject) {
                         [self done:task
-                             for:url
-                          ofType:dataType
-                            with:responseObject
-                           original_url:original_url];
+                                     for:url
+                                  ofType:dataType
+                                    with:responseObject
+                            original_url:original_url];
                     }
                     failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                         [weakSelf processError:error
-                              withOriginalUrl:original_url];
+                               withOriginalUrl  :original_url];
                     }];
         });
 
@@ -194,14 +194,14 @@
                    headers:nil
                    success:^(NSURLSessionDataTask * _Nonnull task) {
                        [self done:task
-                             for:url
-                          ofType:dataType
-                            with:nil
+                                   for:url
+                                ofType:dataType
+                                  with:nil
                           original_url:original_url];
                    }
                    failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                        [weakSelf processError:error
-                             withOriginalUrl:original_url];
+                             withOriginalUrl  :original_url];
                    }];
         });
 
@@ -217,14 +217,14 @@
                    headers:nil
                    success:^(NSURLSessionDataTask * _Nonnull task, id _Nonnull responseObject) {
                        [self done:task
-                             for:url
-                          ofType:dataType
-                            with:responseObject
-                          original_url:original_url];
+                                    for:url
+                                 ofType:dataType
+                                   with:responseObject
+                           original_url:original_url];
                    }
                    failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                        [weakSelf processError:error
-                             withOriginalUrl:original_url];
+                              withOriginalUrl  :original_url];
                    }];
         });
         return;
@@ -244,14 +244,14 @@
               }
                success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject) {
                    [self done:task
-                         for:url
-                      ofType:dataType
-                        with:responseObject
+                              for:url
+                           ofType:dataType
+                             with:responseObject
                       original_url:original_url];
                }
                failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                    [weakSelf processError:error
-                         withOriginalUrl:original_url];
+                        withOriginalUrl  :original_url];
                }];
     });
 }
@@ -370,15 +370,15 @@
           }
            success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject) {
               // Ignore if the url is different
-               if (![JasonHelper  isURL:task.originalRequest.URL
-                    equivalentTo      :sign_url]) {
-               return;
+               if (![JasonHelper isURL:task.originalRequest.URL
+                        equivalentTo      :sign_url]) {
+                 return;
                }
 
                if (!responseObject[@"$jason"]) {
-               [[Jason client] error:@{ @"description": @"The server must return a signed url wrapped with '$jason' key" }
-                    withOriginalUrl:original_url];
-               return;
+                 [[Jason client] error:@{ @"description": @"The server must return a signed url wrapped with '$jason' key" }
+                       withOriginalUrl:original_url];
+                 return;
                }
 
                NSMutableURLRequest * req = [[NSMutableURLRequest alloc] init];
@@ -387,31 +387,31 @@
                [req setHTTPMethod:@"PUT"];
                [req setURL:[NSURL URLWithString:responseObject[@"$jason"]]];
 
-               NSURLSessionDataTask * upload_task = [manager  dataTaskWithRequest:req
-                                                            uploadProgress:^(NSProgress * _Nonnull uploadProgress) {
-               }
-                                                          downloadProgress:^(NSProgress * _Nonnull downloadProgress) {
-               }
-                                                         completionHandler:^(NSURLResponse * _Nonnull response, id _Nullable responseObject, NSError * _Nullable error) {
-                                                             if (!error) {
-                                                             dispatch_async (dispatch_get_main_queue (), ^{
-                                                             [self               s3UploadDidSucceed:upload_filename
-                                                             withOriginalUrl:original_url];
-                                                             });
-                                                             } else {
-                                                             dispatch_async (dispatch_get_main_queue (), ^{
-                                                             DTLogWarning (@"error = %@", error);
-                                                             [self               s3UploadDidFail:error
-                                                             withOriginalUrl:original_url];
-                                                             });
-                                                             }
-               }];
+               NSURLSessionDataTask * upload_task = [manager dataTaskWithRequest:req
+                                                                uploadProgress:^(NSProgress * _Nonnull uploadProgress) {
+                                                            }
+                                                              downloadProgress:^(NSProgress * _Nonnull downloadProgress) {
+                                                          }
+                                                             completionHandler:^(NSURLResponse * _Nonnull response, id _Nullable responseObject, NSError * _Nullable error) {
+                                                                 if (!error) {
+                                                                 dispatch_async (dispatch_get_main_queue (), ^{
+                                                                                     [self s3UploadDidSucceed:upload_filename
+                                                                                              withOriginalUrl:original_url];
+                                                                                 });
+                                                                 } else {
+                                                                 dispatch_async (dispatch_get_main_queue (), ^{
+                                                                                     DTLogWarning (@"error = %@", error);
+                                                                                     [self s3UploadDidFail:error
+                                                                                           withOriginalUrl:original_url];
+                                                                                 });
+                                                                 }
+                                                         }];
 
                [upload_task resume];
            }
            failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-               [self  s3UploadDidFail:error
-               withOriginalUrl:original_url];
+               [self s3UploadDidFail:error
+                   withOriginalUrl:original_url];
            }];
 }
 - (void)s3UploadDidFail:(NSError *)error withOriginalUrl:(NSString *)original_url

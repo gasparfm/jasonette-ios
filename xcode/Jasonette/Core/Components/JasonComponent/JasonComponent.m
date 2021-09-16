@@ -220,11 +220,11 @@
             DTLogInfo (@"Applying Align %@", style[@"align"]);
 
             NSDictionary * alignment_map = @{
-                    @"left": @(NSTextAlignmentLeft),
-                    @"center": @(NSTextAlignmentCenter),
-                    @"right": @(NSTextAlignmentRight),
-                    @"justified": @(NSTextAlignmentJustified),
-                    @"natural": @(NSTextAlignmentNatural)
+                @"left": @(NSTextAlignmentLeft),
+                @"center": @(NSTextAlignmentCenter),
+                @"right": @(NSTextAlignmentRight),
+                @"justified": @(NSTextAlignmentJustified),
+                @"natural": @(NSTextAlignmentNatural)
             };
 
             if ([el respondsToSelector:@selector(textAlignment)]) {

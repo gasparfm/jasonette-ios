@@ -74,7 +74,7 @@
             JSContext * context = [[JSContext alloc] init];
             [context setExceptionHandler:^(JSContext * context, JSValue * value) {
                          DTLogWarning (@"%@", value);
-            }];
+                     }];
 
             [context evaluateScript:js];
 

@@ -218,19 +218,19 @@
         exportSession.outputURL = outputUrl;
         exportSession.outputFileType = AVFileTypeMPEG4;
         [exportSession exportAsynchronouslyWithCompletionHandler:^(void)
-        {
-            NSString * contentType = @"video/mp4";
-            NSData * mediaData = [NSData dataWithContentsOfURL:outputUrl];
-            NSString * base64 = [mediaData base64EncodedStringWithOptions:0];
+                           {
+                               NSString * contentType = @"video/mp4";
+                               NSData * mediaData = [NSData dataWithContentsOfURL:outputUrl];
+                               NSString * base64 = [mediaData base64EncodedStringWithOptions:0];
 
-            NSString * dataFormatString = @"data:video/mp4;base64,%@";
-            NSString * dataString = [NSString stringWithFormat:dataFormatString, base64];
-            NSURL * dataURI = [NSURL URLWithString:dataString];
+                               NSString * dataFormatString = @"data:video/mp4;base64,%@";
+                               NSString * dataString = [NSString stringWithFormat:dataFormatString, base64];
+                               NSURL * dataURI = [NSURL URLWithString:dataString];
 
 
-            NSDictionary * result = @{ @"file_url": url.absoluteString, @"data_uri": dataURI.absoluteString, @"data": base64, @"content_type": contentType };
-            [[Jason client] success:result];
-        }];
+                               NSDictionary * result = @{ @"file_url": url.absoluteString, @"data_uri": dataURI.absoluteString, @"data": base64, @"content_type": contentType };
+                               [[Jason client] success:result];
+                           }];
     } else if (isImage) {
         UIImage * chosenImage;
 

@@ -51,8 +51,10 @@ extern NSString *_Nullable SRStreamNetworkServiceTypeFromURLRequest(NSURLRequest
 {
     NSString *networkServiceType = nil;
     switch (request.networkServiceType) {
-        case NSURLNetworkServiceTypeDefault:
         case NSURLNetworkServiceTypeResponsiveData:
+        case NSURLNetworkServiceTypeAVStreaming:
+        case NSURLNetworkServiceTypeResponsiveAV:
+        case NSURLNetworkServiceTypeDefault:
             break;
         case NSURLNetworkServiceTypeVoIP:
             networkServiceType = NSStreamNetworkServiceTypeVoIP;

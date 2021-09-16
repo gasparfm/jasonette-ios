@@ -38,6 +38,7 @@
     component.payload = payload;
 
     NSString * keyboard = json[@"keyboard"];
+
     keyboard = keyboard ? keyboard : @"text";
 
     if ([keyboard isEqualToString:@"text"]) {
@@ -104,11 +105,11 @@
 
         if (style[@"align"]) {
             NSDictionary * alignment_map = @{
-                    @"left": @(NSTextAlignmentLeft),
-                    @"center": @(NSTextAlignmentCenter),
-                    @"right": @(NSTextAlignmentRight),
-                    @"justified": @(NSTextAlignmentJustified),
-                    @"natural": @(NSTextAlignmentNatural)
+                @"left": @(NSTextAlignmentLeft),
+                @"center": @(NSTextAlignmentCenter),
+                @"right": @(NSTextAlignmentRight),
+                @"justified": @(NSTextAlignmentJustified),
+                @"natural": @(NSTextAlignmentNatural)
             };
             [paragraphStyle setAlignment:[alignment_map[style[@"align"]] intValue]];
         } else {

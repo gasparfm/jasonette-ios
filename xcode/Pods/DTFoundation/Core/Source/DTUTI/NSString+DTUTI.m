@@ -9,7 +9,7 @@
 #import "NSString+DTUTI.h"
 
 #if TARGET_OS_IPHONE
-#import <MobileCoreServices/MobileCoreServices.h>
+#import <CoreServices/CoreServices.h>
 #endif
 
 @implementation NSString (DTUTI)

@@ -72,9 +72,9 @@ static NSMutableDictionary * _stylesheet = nil;
         // This means it's a single element layout
         // And therefore needs to be wrapped inside a simple horizontal layout
         NSDictionary * wrappedItem = @{
-                @"type": @"vertical",
-                @"style": style,
-                @"components": @[item]
+            @"type": @"vertical",
+            @"style": style,
+            @"components": @[item]
         };
         layout = [JasonLayout fillChildLayout:layout with:wrappedItem atIndexPath:indexPath withForm:form];
     }
@@ -288,14 +288,14 @@ static NSMutableDictionary * _stylesheet = nil;
     }
 
     NSDictionary * alignment_map = @{
-            @"fill": @(UIStackViewAlignmentFill),
-            @"firstbaseline": @(UIStackViewAlignmentFirstBaseline),
-            @"lastbaseline": @(UIStackViewAlignmentLastBaseline),
-            @"left": @(UIStackViewAlignmentLeading),
-            @"top": @(UIStackViewAlignmentTop),
-            @"right": @(UIStackViewAlignmentTrailing),
-            @"bottom": @(UIStackViewAlignmentBottom),
-            @"center": @(UIStackViewAlignmentCenter)
+        @"fill": @(UIStackViewAlignmentFill),
+        @"firstbaseline": @(UIStackViewAlignmentFirstBaseline),
+        @"lastbaseline": @(UIStackViewAlignmentLastBaseline),
+        @"left": @(UIStackViewAlignmentLeading),
+        @"top": @(UIStackViewAlignmentTop),
+        @"right": @(UIStackViewAlignmentTrailing),
+        @"bottom": @(UIStackViewAlignmentBottom),
+        @"center": @(UIStackViewAlignmentCenter)
     };
 
     if (style[@"align"]) {
@@ -304,11 +304,11 @@ static NSMutableDictionary * _stylesheet = nil;
     }
 
     NSDictionary * distribution_map = @{
-            @"fill": @(UIStackViewDistributionFill),
-            @"equalsize": @(UIStackViewDistributionFillEqually),
-            @"proportional": @(UIStackViewDistributionFillProportionally),
-            @"equalspace": @(UIStackViewDistributionEqualSpacing),
-            @"equalcentertocenter": @(UIStackViewDistributionEqualCentering)
+        @"fill": @(UIStackViewDistributionFill),
+        @"equalsize": @(UIStackViewDistributionFillEqually),
+        @"proportional": @(UIStackViewDistributionFillProportionally),
+        @"equalspace": @(UIStackViewDistributionEqualSpacing),
+        @"equalcentertocenter": @(UIStackViewDistributionEqualCentering)
     };
 
     if (style[@"distribution"]) {
@@ -403,6 +403,7 @@ static NSMutableDictionary * _stylesheet = nil;
     }
 
     NSMutableDictionary * stylized_item = [item mutableCopy];
+
     stylized_item[@"style"] = new_style;
     return stylized_item;
 }

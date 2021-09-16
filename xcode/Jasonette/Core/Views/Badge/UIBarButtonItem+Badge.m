@@ -85,6 +85,7 @@ NSString const * UIBarButtonItem_badgeValueKey = @"UIBarButtonItem_badgeValueKey
     [frameLabel sizeToFit];
 
     CGSize expectedLabelSize = frameLabel.frame.size;
+
     return expectedLabelSize;
 }
 
@@ -125,6 +126,7 @@ NSString const * UIBarButtonItem_badgeValueKey = @"UIBarButtonItem_badgeValueKey
 
     // Animate the size modification if needed
     NSTimeInterval duration = animated ? 0.2 : 0;
+
     [UIView animateWithDuration:duration
                      animations:^{
                          [self updateBadgeFrame];

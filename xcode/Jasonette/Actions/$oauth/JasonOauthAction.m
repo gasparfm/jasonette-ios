@@ -9,6 +9,7 @@
 #import <Accounts/Accounts.h>
 #import <Social/Social.h>
 #import "JasonNetworking.h"
+#import "JasonLogger.h"
 
 #pragma message "TODO: Update managers to use JasonNetworking"
 
@@ -108,9 +109,9 @@
 
             if ([host containsString:@"facebook"]) {
                 options = @{
-                        ACFacebookAppIdKey: client_id,
-                        // ACFacebookPermissionsKey: @[@"user_friends", @"email"],
-                        ACFacebookAudienceKey: ACFacebookAudienceFriends
+                    ACFacebookAppIdKey: client_id,
+                    // ACFacebookPermissionsKey: @[@"user_friends", @"email"],
+                    ACFacebookAudienceKey: ACFacebookAudienceFriends
                 };
             }
 
@@ -131,50 +132,50 @@
                                                  options:options
                                               completion:^(BOOL granted, NSError * error) {
                                                   if (granted == YES) {
-                                                  NSArray * arrayOfAccounts = [account accountsWithAccountType:accountType];
+                                                      NSArray * arrayOfAccounts = [account accountsWithAccountType:accountType];
 
-                                                  if ([arrayOfAccounts count] > 0) {
-                                                  dispatch_async (dispatch_get_main_queue (), ^{
-                                                  AHKActionSheet * actionSheet = [[AHKActionSheet alloc] initWithTitle:nil];
+                                                      if ([arrayOfAccounts count] > 0) {
+                                                          dispatch_async (dispatch_get_main_queue (), ^{
+                                                                              AHKActionSheet * actionSheet = [[AHKActionSheet alloc] initWithTitle:nil];
 
-                                                  for (int i = 0; i < arrayOfAccounts.count; i++) {
-                                                    ACAccount * a = arrayOfAccounts[i];
-                                                    [actionSheet addButtonWithTitle:a.username
-                                                                               type:AHKActionSheetButtonTypeDefault
-                                                                            handler:^(AHKActionSheet * as) {
-                                                                                dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                                                                                UICKeyChainStore * keychain = [UICKeyChainStore keyChainStoreWithService:@"$socialframework"];
-                                                                                [keychain setString:a.identifier
-                                                                                forKey:client_id];
-                                                                                [self performSocialFrameworkRequestFor:a];
-                                                                                });
-                                                  }];
-                                                  }
+                                                                              for (int i = 0; i < arrayOfAccounts.count; i++) {
+                                                                                  ACAccount * a = arrayOfAccounts[i];
+                                                                                  [actionSheet addButtonWithTitle:a.username
+                                                                                                             type:AHKActionSheetButtonTypeDefault
+                                                                                                          handler:^(AHKActionSheet * as) {
+                                                                                                              dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                                                                                                              UICKeyChainStore * keychain = [UICKeyChainStore keyChainStoreWithService:@"$socialframework"];
+                                                                                                              [keychain setString:a.identifier
+                                                                                                                  forKey:client_id];
+                                                                                                              [self performSocialFrameworkRequestFor:a];
+                                                                                                              });
+                                                                             }];
+                                                                              }
 
-                                                  actionSheet.title = @"Select an account";
-                                                  actionSheet.blurTintColor = [UIColor colorWithWhite:1.0f
-                                                                                              alpha:0.75f];
-                                                  actionSheet.blurRadius = 8.0f;
-                                                  actionSheet.buttonHeight = 45.0f;
+                                                                              actionSheet.title = @"Select an account";
+                                                                              actionSheet.blurTintColor = [UIColor colorWithWhite:1.0f
+                                                                                                                            alpha:0.75f];
+                                                                              actionSheet.blurRadius = 8.0f;
+                                                                              actionSheet.buttonHeight = 45.0f;
 
-                                                  actionSheet.animationDuration = 0.2f;
-                                                  UIFont * defaultFont = [UIFont fontWithName:@"HelveticaNeue"
-                                                                                       size:16.0f];
-                                                  actionSheet.buttonTextAttributes = @{ NSFontAttributeName: defaultFont,
-                                                                                      NSForegroundColorAttributeName: [UIColor blackColor] };
-                                                  actionSheet.disabledButtonTextAttributes = @{ NSFontAttributeName: defaultFont,
-                                                                                              NSForegroundColorAttributeName: [UIColor grayColor] };
-                                                  actionSheet.destructiveButtonTextAttributes = @{ NSFontAttributeName: defaultFont,
-                                                                                                 NSForegroundColorAttributeName: [UIColor redColor] };
-                                                  actionSheet.cancelButtonTextAttributes = @{ NSFontAttributeName: defaultFont,
-                                                                                            NSForegroundColorAttributeName: [UIColor blackColor] };
-                                                  [actionSheet show];
-                                                  });
+                                                                              actionSheet.animationDuration = 0.2f;
+                                                                              UIFont * defaultFont = [UIFont fontWithName:@"HelveticaNeue"
+                                                                                                                     size:16.0f];
+                                                                              actionSheet.buttonTextAttributes = @{ NSFontAttributeName: defaultFont,
+                                                                                                                    NSForegroundColorAttributeName: [UIColor blackColor] };
+                                                                              actionSheet.disabledButtonTextAttributes = @{ NSFontAttributeName: defaultFont,
+                                                                                                                            NSForegroundColorAttributeName: [UIColor grayColor] };
+                                                                              actionSheet.destructiveButtonTextAttributes = @{ NSFontAttributeName: defaultFont,
+                                                                                                                               NSForegroundColorAttributeName: [UIColor redColor] };
+                                                                              actionSheet.cancelButtonTextAttributes = @{ NSFontAttributeName: defaultFont,
+                                                                                                                          NSForegroundColorAttributeName: [UIColor blackColor] };
+                                                                              [actionSheet show];
+                                                                          });
+                                                      } else {
+                                                          [[Jason client] error];
+                                                      }
                                                   } else {
-                                                  [[Jason client] error];
-                                                  }
-                                                  } else {
-                                                  [[Jason client] error];
+                                                      [[Jason client] error];
                                                   }
                                               }];
             }
@@ -326,10 +327,10 @@
                          }
                         completionHandler:^(NSURLResponse * _Nonnull response, id _Nullable responseObject, NSError * _Nullable error) {
                             if (!error) {
-                            [[Jason client] success:responseObject];
+                                [[Jason client] success:responseObject];
                             } else {
-                            [[NSNotificationCenter defaultCenter] removeObserver:self];
-                            [[Jason client] error];
+                                [[NSNotificationCenter defaultCenter] removeObserver:self];
+                                [[Jason client] error];
                             }
                         }] resume];
         }
@@ -388,32 +389,32 @@
                        BOOL same = YES;
 
                        if ([originalRequestPath isEqualToString:path]) {
-                       if (task.originalRequest.URL.query && task.originalRequest.URL.query.length > 0) {
-                        NSArray * originalRequestQueries = [task.originalRequest.URL.query componentsSeparatedByString:@"&"];
+                         if (task.originalRequest.URL.query && task.originalRequest.URL.query.length > 0) {
+                             NSArray * originalRequestQueries = [task.originalRequest.URL.query componentsSeparatedByString:@"&"];
 
-                        for (NSString * kv in originalRequestQueries) {
-                            NSArray * pairComponents = [kv componentsSeparatedByString:@"="];
-                            NSString * key = [[pairComponents firstObject] stringByRemovingPercentEncoding];
-                            NSString * value = [[pairComponents lastObject] stringByRemovingPercentEncoding];
+                             for (NSString * kv in originalRequestQueries) {
+                                 NSArray * pairComponents = [kv componentsSeparatedByString:@"="];
+                                 NSString * key = [[pairComponents firstObject] stringByRemovingPercentEncoding];
+                                 NSString * value = [[pairComponents lastObject] stringByRemovingPercentEncoding];
 
-                            // check if the value is the same as the original
-                            if (![parameters[key] isEqualToString:value]) {
-                                same = NO;
-                                break;
-                            }
-                        }
-                       }
+                                 // check if the value is the same as the original
+                                 if (![parameters[key] isEqualToString:value]) {
+                                     same = NO;
+                                     break;
+                                 }
+                             }
+                         }
                        } else {
-                       same = NO;
+                         same = NO;
                        }
 
                        if (same) {
-                       [[Jason client] success:responseObject];
+                         [[Jason client] success:responseObject];
                        }
                    }
                    failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                       NSString * ErrorResponse = [[NSString alloc]  initWithData:(NSData *)error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey]
-                                                                  encoding:NSUTF8StringEncoding];
+                       NSString * ErrorResponse = [[NSString alloc] initWithData:(NSData *)error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey]
+                                                                      encoding:NSUTF8StringEncoding];
                        NSLog (@"#E = %@", ErrorResponse);
                        [[Jason client] error];
                    }];
@@ -430,19 +431,19 @@
                        NSString * originalRequestQuery = nil;
 
                        if (task.originalRequest.URL.query && task.originalRequest.URL.query.length > 0) {
-                       originalRequestQuery = [task.originalRequest.URL.query stringByRemovingPercentEncoding];
+                          originalRequestQuery = [task.originalRequest.URL.query stringByRemovingPercentEncoding];
                        }
 
                        NSString * originalRequestFullPath;
 
                        if (originalRequestQuery) {
-                       originalRequestFullPath = [NSString stringWithFormat:@"%@?%@", originalRequestPath, originalRequestQuery];
+                          originalRequestFullPath = [NSString stringWithFormat:@"%@?%@", originalRequestPath, originalRequestQuery];
                        } else {
-                       originalRequestFullPath = originalRequestPath;
+                          originalRequestFullPath = originalRequestPath;
                        }
 
                        if (![originalRequestFullPath isEqualToString:path]) {
-                       return;
+                          return;
                        }
 
                        [[Jason client] success:responseObject];
@@ -460,19 +461,19 @@
                        NSString * originalRequestQuery = nil;
 
                        if (task.originalRequest.URL.query && task.originalRequest.URL.query.length > 0) {
-                       originalRequestQuery = [task.originalRequest.URL.query stringByRemovingPercentEncoding];
+                         originalRequestQuery = [task.originalRequest.URL.query stringByRemovingPercentEncoding];
                        }
 
                        NSString * originalRequestFullPath;
 
                        if (originalRequestQuery) {
-                       originalRequestFullPath = [NSString stringWithFormat:@"%@?%@", originalRequestPath, originalRequestQuery];
+                         originalRequestFullPath = [NSString stringWithFormat:@"%@?%@", originalRequestPath, originalRequestQuery];
                        } else {
-                       originalRequestFullPath = originalRequestPath;
+                         originalRequestFullPath = originalRequestPath;
                        }
 
                        if (![originalRequestFullPath isEqualToString:path]) {
-                       return;
+                         return;
                        }
 
                        [[Jason client] success:responseObject];
@@ -490,19 +491,19 @@
                        NSString * originalRequestQuery = nil;
 
                        if (task.originalRequest.URL.query && task.originalRequest.URL.query.length > 0) {
-                       originalRequestQuery = [task.originalRequest.URL.query stringByRemovingPercentEncoding];
+                          originalRequestQuery = [task.originalRequest.URL.query stringByRemovingPercentEncoding];
                        }
 
                        NSString * originalRequestFullPath;
 
                        if (originalRequestQuery) {
-                       originalRequestFullPath = [NSString stringWithFormat:@"%@?%@", originalRequestPath, originalRequestQuery];
+                          originalRequestFullPath = [NSString stringWithFormat:@"%@?%@", originalRequestPath, originalRequestQuery];
                        } else {
-                       originalRequestFullPath = originalRequestPath;
+                          originalRequestFullPath = originalRequestPath;
                        }
 
                        if (![originalRequestFullPath isEqualToString:path]) {
-                       return;
+                          return;
                        }
 
                        [[Jason client] success];
@@ -520,19 +521,19 @@
                         NSString * originalRequestQuery = nil;
 
                         if (task.originalRequest.URL.query && task.originalRequest.URL.query.length > 0) {
-                        originalRequestQuery = [task.originalRequest.URL.query stringByRemovingPercentEncoding];
+                            originalRequestQuery = [task.originalRequest.URL.query stringByRemovingPercentEncoding];
                         }
 
                         NSString * originalRequestFullPath;
 
                         if (originalRequestQuery) {
-                        originalRequestFullPath = [NSString stringWithFormat:@"%@?%@", originalRequestPath, originalRequestQuery];
+                            originalRequestFullPath = [NSString stringWithFormat:@"%@?%@", originalRequestPath, originalRequestQuery];
                         } else {
-                        originalRequestFullPath = originalRequestPath;
+                            originalRequestFullPath = originalRequestPath;
                         }
 
                         if (![originalRequestFullPath isEqualToString:path]) {
-                        return;
+                            return;
                         }
 
                         [[Jason client] success:responseObject];
@@ -559,17 +560,17 @@
 
         if ([host containsString:@"facebook"]) {
             options = @{
-                    ACFacebookAppIdKey: client_id,
-                    // ACFacebookPermissionsKey: @[@"user_friends", @"email"],
-                    ACFacebookAudienceKey: ACFacebookAudienceFriends
+                ACFacebookAppIdKey: client_id,
+                // ACFacebookPermissionsKey: @[@"user_friends", @"email"],
+                ACFacebookAudienceKey: ACFacebookAudienceFriends
             };
             [accountStore requestAccessToAccountsWithType:accountTypeFacebook
                                                   options:options
                                                completion:^(BOOL granted, NSError * error) {
                                                    if (granted) {
-                                                   NSArray * accounts = [accountStore accountsWithAccountType:accountTypeFacebook];
-                                                   ACAccount * account = [accounts lastObject];
-                                                   [[Jason client] success:@{ @"token": account.credential.oauthToken }];
+                                                       NSArray * accounts = [accountStore accountsWithAccountType:accountTypeFacebook];
+                                                       ACAccount * account = [accounts lastObject];
+                                                       [[Jason client] success:@{ @"token": account.credential.oauthToken }];
                                                    }
                                                }];
         }
@@ -612,8 +613,8 @@
                                               refreshToken:credential.refreshToken
                                                    success:^(AFOAuthCredential * credential) {
                                                        NSLog (@"Success! your new credential is %@", credential);
-                                                       [AFOAuthCredential  storeCredential:credential
-                                                       withIdentifier:client_id];
+                                                       [AFOAuthCredential storeCredential:credential
+                                                                           withIdentifier:client_id];
                                                        [[Jason client] success];
                                                    }
                                                    failure:^(NSError * error) {
@@ -706,50 +707,54 @@
                                                              completionHandler:^(NSURLResponse * _Nonnull response, id _Nullable responseObject, NSError * _Nullable error) {
                                                                  // Ignore if the url is different
                                                                  if (![request.URL.absoluteString isEqualToString:response.URL.absoluteString]) {
-                                                                 return;
+                                                                     return;
                                                                  }
 
                                                                  if (!error) {
-                                                                 dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                                                                 NSString * s = [[NSString alloc]        initWithData:responseObject
-                                                                                            encoding:NSUTF8StringEncoding];
+                                                                     dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                                                                                         NSString * s = [[NSString alloc] initWithData:responseObject
+                                                                                                                              encoding:NSUTF8StringEncoding];
 
-                                                                 NSString * urlToParse = [NSString stringWithFormat:@"http://localhost?%@", s];
-                                                                 NSArray * queryItems = [self extractQueryParams:urlToParse];
-                                                                 NSString * oauth_token = [self        valueForKey:@"oauth_token"
-                                                                                   fromQueryItems  :queryItems];
-                                                                 NSString * oauth_token_secret = [self        valueForKey:@"oauth_token_secret"
-                                                                                          fromQueryItems  :queryItems];
-                                                                 NSString * authorize_url;
+                                                                                         NSString * urlToParse = [NSString stringWithFormat:@"http://localhost?%@", s];
+                                                                                         NSArray * queryItems = [self extractQueryParams:urlToParse];
+                                                                                         NSString * oauth_token = [self valueForKey:@"oauth_token"
+                                                                                                                     fromQueryItems  :queryItems];
+                                                                                         NSString * oauth_token_secret = [self valueForKey:@"oauth_token_secret"
+                                                                                                                            fromQueryItems  :queryItems];
+                                                                                         NSString * authorize_url;
 
-                                                                 if (oauth_token_secret) {
-                                                                 self.cache = [@{ @"oauth1_three_legged_secret": oauth_token_secret } mutableCopy];
-                                                                 authorize_url = [NSString stringWithFormat:@"%@://%@%@?oauth_token=%@&oauth_token_secret=%@", authorize_options[@"scheme"], authorize_options[@"host"], authorize_options[@"path"], oauth_token, oauth_token_secret];
+                                                                                         if (oauth_token_secret) {
+                                                                                             self.cache = [@{ @"oauth1_three_legged_secret": oauth_token_secret } mutableCopy];
+                                                                                             authorize_url = [NSString stringWithFormat:@"%@://%@%@?oauth_token=%@&oauth_token_secret=%@", authorize_options[@"scheme"], authorize_options[@"host"], authorize_options[@"path"], oauth_token, oauth_token_secret];
+                                                                                         } else {
+                                                                                             self.cache = nil;
+                                                                                             authorize_url = [NSString stringWithFormat:@"%@://%@%@?oauth_token=%@", authorize_options[@"scheme"], authorize_options[@"host"], authorize_options[@"path"], oauth_token];
+                                                                                         }
+
+                                                                                         dispatch_async (dispatch_get_main_queue (), ^{
+                                                                                                             NSURL * URL = [NSURL URLWithString:authorize_url];
+                                                                                                             NSString * view = authorize_options[@"view"];
+
+                                                                                                             if (view && [view isEqualToString:@"app"]) {
+                                                                                                                 // Launch external safari for oauth
+                                                                                                                 [[UIApplication sharedApplication] openURL:URL
+                                                                                                                                                    options:@{}
+                                                                                                                                          completionHandler:^(BOOL success) {
+                                                                                                                                              DTLogDebug (@"Openned %@", URL);
+                                                                                                                                }];
+                                                                                                             } else {
+                                                                                                                 // By default use SFSafariViewController
+                                                                                                                 SFSafariViewController * vc = [[SFSafariViewController alloc] initWithURL:URL];
+                                                                                                                 vc.delegate = self;
+                                                                                                                 [self.VC presentViewController:vc
+                                                                                                                                       animated:NO
+                                                                                                                                     completion:^{ }];
+                                                                                                             }
+                                                                                                         });
+                                                                                     });
                                                                  } else {
-                                                                 self.cache = nil;
-                                                                 authorize_url = [NSString stringWithFormat:@"%@://%@%@?oauth_token=%@", authorize_options[@"scheme"], authorize_options[@"host"], authorize_options[@"path"], oauth_token];
-                                                                 }
-
-                                                                 dispatch_async (dispatch_get_main_queue (), ^{
-                                                                    NSURL * URL = [NSURL URLWithString:authorize_url];
-                                                                    NSString * view = authorize_options[@"view"];
-
-                                                                    if (view && [view isEqualToString:@"app"]) {
-                                                                        // Launch external safari for oauth
-                                                                        [[UIApplication sharedApplication] openURL:URL];
-                                                                    } else {
-                                                                        // By default use SFSafariViewController
-                                                                        SFSafariViewController * vc = [[SFSafariViewController alloc] initWithURL:URL];
-                                                                        vc.delegate = self;
-                                                                        [self.VC presentViewController:vc
-                                                                                              animated:NO
-                                                                                            completion:^{ }];
-                                                                    }
-                                                                 });
-                                                                 });
-                                                                 } else {
-                                                                 [[NSNotificationCenter defaultCenter] removeObserver:self];
-                                                                 [[Jason client] error];
+                                                                     [[NSNotificationCenter defaultCenter] removeObserver:self];
+                                                                     [[Jason client] error];
                                                                  }
                                                              }];
 
@@ -792,11 +797,11 @@
         NSDictionary * access_options = self.options[@"access"];
 
         if ([access_options[@"data"][@"grant_type"] isEqualToString:@"password"]) {
-        /********************************************************************************
-        *
-        * Case 1: Password type
-        *
-        ********************************************************************************/
+            /********************************************************************************
+            *
+            * Case 1: Password type
+            *
+            ********************************************************************************/
             NSString * client_id = self.options[@"access"][@"client_id"];
             NSString * client_secret = self.options[@"access"][@"client_secret"];
 
@@ -844,15 +849,15 @@
                                NSString * refresh_token = responseObject[@"refresh_token"];
 
                                if (access_token) {
-                               NSString * token_type = responseObject[@"token_type"];
-                               AFOAuthCredential * credential = [AFOAuthCredential credentialWithOAuthToken:access_token
-                                                                                               tokenType:token_type];
-                               credential.refreshToken = refresh_token;
-                               [AFOAuthCredential storeCredential:credential
-                                                withIdentifier:client_id];
-                               [[Jason client] success];
+                                  NSString * token_type = responseObject[@"token_type"];
+                                  AFOAuthCredential * credential = [AFOAuthCredential credentialWithOAuthToken:access_token
+                                                                                                     tokenType:token_type];
+                                  credential.refreshToken = refresh_token;
+                                  [AFOAuthCredential storeCredential:credential
+                                                      withIdentifier:client_id];
+                                  [[Jason client] success];
                                } else {
-                               [[Jason client] error];
+                                  [[Jason client] error];
                                }
                            }
                            failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
@@ -885,7 +890,7 @@
                     if (credential && credential.isExpired && credential.refreshToken) {
                         [self refresh_token:client_id];
                     } else {
-                    // Generate the final url (U) from scheme/host/path/data
+                        // Generate the final url (U) from scheme/host/path/data
                         NSString * url = [NSString stringWithFormat:@"%@://%@%@", authorize_options[@"scheme"], authorize_options[@"host"], authorize_options[@"path"]];
                         NSMutableDictionary * parameters = [authorize_options[@"data"] mutableCopy];
                         NSURLComponents * components = [NSURLComponents componentsWithString:url];
@@ -908,7 +913,11 @@
 
                         if (view && [view isEqualToString:@"app"]) {
                             // Launch external safari for oauth
-                            [[UIApplication sharedApplication] openURL:U];
+                            [[UIApplication sharedApplication] openURL:U
+                                                               options:@{}
+                                                     completionHandler:^(BOOL success) {
+                                                         DTLogDebug (@"Openned %@", U);
+                                                     }];
                         } else {
                             // By default use SFSafariViewController
                             SFSafariViewController * vc = [[SFSafariViewController alloc] initWithURL:U];
@@ -1007,34 +1016,34 @@
                                                          completionHandler:^(NSURLResponse * _Nonnull response, id _Nullable responseObject, NSError * _Nullable error) {
                                                              // Ignore if the url is different
                                                              if (![request.URL.absoluteString isEqualToString:response.URL.absoluteString]) {
-                                                             return;
+                                                                 return;
                                                              }
 
                                                              if (!error) {
-                                                             // Temp url just to take advantage of componentsWithURL
-                                                             NSString * s = [[NSString alloc]                            initWithData:responseObject
-                                                                                        encoding:NSUTF8StringEncoding];
-                                                             NSString * urlToParse = [NSString stringWithFormat:@"http://localhost?%@", s];
-                                                             NSURLComponents * components = [NSURLComponents                            componentsWithURL:[NSURL URLWithString:urlToParse]
-                                                                                             resolvingAgainstBaseURL     :NO];
-                                                             NSArray * queryItems = [components queryItems];
-                                                             NSString * oauth_token = [self                            valueForKey:@"oauth_token"
-                                                                               fromQueryItems  :queryItems];
-                                                             NSString * oauth_token_secret = [self                            valueForKey:@"oauth_token_secret"
-                                                                                      fromQueryItems  :queryItems];
+                                                                 // Temp url just to take advantage of componentsWithURL
+                                                                 NSString * s = [[NSString alloc] initWithData:responseObject
+                                                                                                      encoding:NSUTF8StringEncoding];
+                                                                 NSString * urlToParse = [NSString stringWithFormat:@"http://localhost?%@", s];
+                                                                 NSURLComponents * components = [NSURLComponents componentsWithURL:[NSURL URLWithString:urlToParse]
+                                                                                                           resolvingAgainstBaseURL     :NO];
+                                                                 NSArray * queryItems = [components queryItems];
+                                                                 NSString * oauth_token = [self valueForKey:@"oauth_token"
+                                                                                             fromQueryItems  :queryItems];
+                                                                 NSString * oauth_token_secret = [self valueForKey:@"oauth_token_secret"
+                                                                                                    fromQueryItems  :queryItems];
 
 
-                                                             NSString * APP_NAME = [[NSBundle mainBundle] bundleIdentifier];
+                                                                 NSString * APP_NAME = [[NSBundle mainBundle] bundleIdentifier];
 
-                                                             UICKeyChainStore * keychain = [UICKeyChainStore keyChainStoreWithService:[NSString stringWithFormat:@"%@", APP_NAME]];
-                                                             [keychain                            setString:oauth_token
-                                                                forKey:[NSString stringWithFormat:@"%@#token", client_id]];
-                                                             [keychain                            setString:oauth_token_secret
-                                                                forKey:[NSString stringWithFormat:@"%@#secret", client_id]];
-                                                             [[Jason client] success];
+                                                                 UICKeyChainStore * keychain = [UICKeyChainStore keyChainStoreWithService:[NSString stringWithFormat:@"%@", APP_NAME]];
+                                                                 [keychain setString:oauth_token
+                                                                              forKey:[NSString stringWithFormat:@"%@#token", client_id]];
+                                                                 [keychain setString:oauth_token_secret
+                                                                              forKey:[NSString stringWithFormat:@"%@#secret", client_id]];
+                                                                 [[Jason client] success];
                                                              } else {
-                                                             [[NSNotificationCenter defaultCenter] removeObserver:self];
-                                                             [[Jason client] error];
+                                                                 [[NSNotificationCenter defaultCenter] removeObserver:self];
+                                                                 [[Jason client] error];
                                                              }
                                                          }];
 
@@ -1149,15 +1158,15 @@
                 [OAuth2Manager authenticateUsingOAuthWithURLString:access_options[@"path"]
                                                         parameters:access_data
                                                            success:^(AFOAuthCredential * credential) {
-                                                               [AFOAuthCredential  storeCredential:credential
-                                                               withIdentifier:client_id];
+                                                               [AFOAuthCredential storeCredential:credential
+                                                                                   withIdentifier:client_id];
 
                                                                [[Jason client] success];
                                                            }
                                                            failure:^(NSError * error) {
                                                                NSLog (@"Error: %@", error);
-                                                               NSString * ErrorResponse = [[NSString alloc]  initWithData:(NSData *)error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey]
-                                                                      encoding:NSUTF8StringEncoding];
+                                                               NSString * ErrorResponse = [[NSString alloc] initWithData:(NSData *)error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey]
+                                                                                                                encoding:NSUTF8StringEncoding];
                                                                NSLog (@"#ncoded = %@", ErrorResponse);
 
                                                                [[Jason client] error];

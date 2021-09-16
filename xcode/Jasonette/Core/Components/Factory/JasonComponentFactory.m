@@ -102,6 +102,7 @@ static NSMutableDictionary * _stylesheet = nil;
     }
 
     NSMutableDictionary * stylizedComponent = [json mutableCopy];
+
     stylizedComponent[@"style"] = styles;
 
     DTLogInfo (@"End Stylesheet");

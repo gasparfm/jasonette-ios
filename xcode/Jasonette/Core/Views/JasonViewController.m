@@ -46,11 +46,11 @@
 
 @implementation JasonViewController
 
-- (NSDictionary *) style {
-    if(!_style) {
+- (NSDictionary *)style {
+    if (!_style) {
         _style = @{};
     }
-    
+
     return _style;
 }
 
@@ -195,7 +195,9 @@
 }
 
 - (void)unlock {
-    [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    dispatch_async (dispatch_get_main_queue (), ^{
+        [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    });
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -627,21 +629,21 @@
         }
     } @catch (NSException * e) {
         NSDictionary * item = @{
-                @"type": @"vertical",
-                @"style": @{
-                    @"spacing": @"5"
-                },
-                @"components": @[
-                    @{
-                        @"type": @"label",
-                        @"text": @"Error",
-                        @"style": @{ @"size": @"30", @"align": @"center", @"padding": @"10" }
-                    }, @{
-                        @"type": @"label",
-                        @"text": @"Something went wrong.",
-                        @"style": @{ @"size": @"12", @"align": @"center", @"padding": @"10" }
-                    }
-                ]
+            @"type": @"vertical",
+            @"style": @{
+                @"spacing": @"5"
+            },
+            @"components": @[
+                @{
+                    @"type": @"label",
+                    @"text": @"Error",
+                    @"style": @{ @"size": @"30", @"align": @"center", @"padding": @"10" }
+                }, @{
+                    @"type": @"label",
+                    @"text": @"Something went wrong.",
+                    @"style": @{ @"size": @"12", @"align": @"center", @"padding": @"10" }
+                }
+            ]
         };
         hasError = YES;
         return [self getVerticalSectionItem:item forTableView:tableView atIndexPath:indexPath];
@@ -1044,8 +1046,14 @@
 - (void)loadAssets:(NSDictionary *)body {
     JasonViewController * weakSelf = self;
 
+    DTLogDebug (@"Load Assets");
     dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        NSArray * keys = [body allKeys];
+        DTLogDebug (@"Body %@", body);
+        NSArray * keys = @[];
+
+        if ([body respondsToSelector:@selector(allKeys)]) {
+            keys = [body allKeys];
+        }
 
         for (NSString * key in keys) {
             if ([body[key] isKindOfClass:[NSArray class]]) {
@@ -1064,16 +1072,16 @@
                 [self loadAssets:body[key]];
             } else {
                 if ([body[key] isKindOfClass:[NSString class]]) {
-                // String => Terminal Node
+                    // String => Terminal Node
                     if ([key isEqualToString:@"url"]) {
-                // it's a url!
-                // see if it's an image type
+                        // it's a url!
+                        // see if it's an image type
                         if (body[@"type"]) {
                             if ([body[@"type"] isEqualToString:@"image"] || [body[@"type"] isEqualToString:@"button"]) {
                                 if (body[@"style"]) {
-                // [Image load optimization] Don't load assets if
-                // 1. height exists or
-                // 2. width + ratio exist
+                                    // [Image load optimization] Don't load assets if
+                                    // 1. height exists or
+                                    // 2. width + ratio exist
                                     if (body[@"style"][@"height"]) {
                                         return;
                                     } else if (body[@"style"][@"width"] && body[@"style"][@"ratio"]) {
@@ -1108,25 +1116,25 @@
                                                                             self->download_image_counter--;
 
                                                                             if (!error) {
-                                                                            JasonComponentFactory.imageLoaded[url] = [NSValue valueWithCGSize:i.size];
+                                                                                JasonComponentFactory.imageLoaded[url] = [NSValue valueWithCGSize:i.size];
                                                                             }
 
                                                                             // [self.tableView visibleCells];
                                                                             dispatch_async (dispatch_get_main_queue (), ^{
-                                                                            NSArray * indexPathArray = weakSelf.tableView.indexPathsForVisibleRows;
-                                                                            NSMutableSet * visibleIndexPaths = [[NSMutableSet alloc] initWithArray:indexPathArray];
-                                                                            [visibleIndexPaths intersectSet:(NSSet *)self->indexPathsForImage[url]];
+                                                                                                NSArray * indexPathArray = weakSelf.tableView.indexPathsForVisibleRows;
+                                                                                                NSMutableSet * visibleIndexPaths = [[NSMutableSet alloc] initWithArray:indexPathArray];
+                                                                                                [visibleIndexPaths intersectSet:(NSSet *)self->indexPathsForImage[url]];
 
-                                                                            if (visibleIndexPaths.count > 0) {
-                                                                            [weakSelf.tableView reloadData];
-                                                                            }
+                                                                                                if (visibleIndexPaths.count > 0) {
+                                                                                                    [weakSelf.tableView reloadData];
+                                                                                                }
 
-                                                                            if (!self->top_aligned) {
-                                                                            if (self->download_image_counter == 0) {
-                                                                            [weakSelf scrollToBottom];
-                                                                            }
-                                                                            }
-                                                                            });
+                                                                                                if (!self->top_aligned) {
+                                                                                                    if (self->download_image_counter == 0) {
+                                                                                                        [weakSelf scrollToBottom];
+                                                                                                    }
+                                                                                                }
+                                                                                            });
                                                                         }];
                                 }
                             }
@@ -1385,8 +1393,8 @@
         NSDictionary * header = body[@"header"];
 
         if (header) {
-        // only handles components specific to TableView (search/tabs).
-        // common component (menu) is handled in Jason.m
+            // only handles components specific to TableView (search/tabs).
+            // common component (menu) is handled in Jason.m
             tabs = nil;
 
             for (NSString * type in [header allKeys]) {
@@ -1549,6 +1557,7 @@
 
 
     id weakSelf = self;
+
     [weakSelf loadAssets:body];
 
     if (self.events[@"$pull"]) {
@@ -1591,8 +1600,20 @@
     }
 
     for (NSDictionary * section in self.sections) {
-        NSMutableDictionary * header = section[@"header"];
-        NSNumber * rowcount_for_section = [NSNumber numberWithLong:[section[@"items"] count]];
+        NSMutableDictionary * header = [@{} mutableCopy];
+        NSArray * items = @[];
+
+        if ([section respondsToSelector:@selector(objectForKey:)]) {
+            if (section[@"header"]) {
+                header = section[@"header"];
+            }
+
+            if (section[@"items"] && [section[@"items"] respondsToSelector:@selector(count)]) {
+                items = section[@"items"];
+            }
+        }
+
+        NSNumber * rowcount_for_section = [NSNumber numberWithLong:[items count]];
         [rowcount addObject:rowcount_for_section];
         total_rowcount = total_rowcount + [rowcount_for_section longValue];
 
@@ -1600,7 +1621,7 @@
             // No header
             [headers addObject:@{}];
         } else {
-            [headers addObject:section[@"header"]];
+            [headers addObject:header];
         }
     }
 
@@ -1624,16 +1645,16 @@
             CGFloat originalHeight = original_height;
 
             [self.view addKeyboardPanningWithActionHandler:^(CGRect keyboardFrameInView, BOOL opening, BOOL closing)
-            {
-                CGFloat m = MIN (originalHeight, keyboardFrameInView.origin.y);
+                           {
+                               CGFloat m = MIN (originalHeight, keyboardFrameInView.origin.y);
 
-                if (opening || (closing && m >= weakSelf.view.frame.size.height)) {
-                    CGRect newViewFrame = CGRectMake (weakSelf.view.frame.origin.x,
-                                                      weakSelf.view.frame.origin.y,
-                                                      weakSelf.view.frame.size.width, m);
-                    weakSelf.view.frame = newViewFrame;
-                }
-            }];
+                               if (opening || (closing && m >= weakSelf.view.frame.size.height)) {
+                                   CGRect newViewFrame = CGRectMake (weakSelf.view.frame.origin.x,
+                                                                     weakSelf.view.frame.origin.y,
+                                                                     weakSelf.view.frame.size.width, m);
+                                   weakSelf.view.frame = newViewFrame;
+                               }
+                           }];
 
             // textfield logic
 
@@ -1673,22 +1694,22 @@
 
             // input field styling
             if (field[@"style"]) {
-            // PHFComposeBarView hack to find relevant views and apply style
-            // [JasonHelper force_background:@"#000000" intoView:composeBarView];
+                // PHFComposeBarView hack to find relevant views and apply style
+                // [JasonHelper force_background:@"#000000" intoView:composeBarView];
                 for (UIView * v in self.composeBarView.subviews) {
                     for (UIView * vv in v.subviews) {
                         if ([vv isKindOfClass:[UITextView class]]) {
                             vv.superview.layer.borderWidth = 0;
 
                             for (UIView * vvv in vv.superview.subviews) {
-            // textfield background
+                                // textfield background
                                 if (field[@"style"][@"background"]) {
                                     vvv.backgroundColor = [JasonHelper colorwithHexString:field[@"style"][@"background"] alpha:1.0];
                                 }
 
-            // placeholder color
+                                // placeholder color
                                 if ([vvv isKindOfClass:[UILabel class]]) {
-            // placeholder label
+                                    // placeholder label
                                     ((UILabel *)vvv).textColor = [JasonHelper colorwithHexString:field[@"style"][@"color:placeholder"] alpha:1.0];
                                 }
                             }
@@ -1733,17 +1754,17 @@
                                                 completed:^(UIImage * image, NSError * error, SDImageCacheType cacheType, BOOL finished, NSURL * imageURL) {
                                                     // colorize
                                                     if (self->chat_input[@"left"][@"style"] && self->chat_input[@"left"][@"style"][@"color"]) {
-                                                    UIColor * newColor = [JasonHelper colorwithHexString:self->chat_input[@"left"][@"style"][@"color"]
-                                                                                   alpha:1.0];
-                                                    image = [JasonHelper colorize:image
-                                                             into:newColor];
+                                                        UIColor * newColor = [JasonHelper colorwithHexString:self->chat_input[@"left"][@"style"][@"color"]
+                                                                                                       alpha:1.0];
+                                                        image = [JasonHelper colorize:image
+                                                                                 into:newColor];
                                                     }
 
-                                                    UIImage * resizedImage = [JasonHelper  scaleImage:image
-                                                                           ToSize:CGSizeMake (30, 30)];
+                                                    UIImage * resizedImage = [JasonHelper scaleImage:image
+                                                                                              ToSize:CGSizeMake (30, 30)];
                                                     dispatch_async (dispatch_get_main_queue (), ^{
-                                                    [self.composeBarView setUtilityButtonImage:resizedImage];
-                                                    });
+                                                                        [self.composeBarView setUtilityButtonImage:resizedImage];
+                                                                    });
                                                 }
                             ];
                         });
@@ -1764,16 +1785,16 @@
 
                     for (UIButton * button in buttons) {
                         if ([button.subviews.firstObject isKindOfClass:[UILabel class]]) {
-                    // set "color"
+                            // set "color"
                             if (chat_input[@"right"][@"style"] && chat_input[@"right"][@"style"][@"color"]) {
                                 [button setTitleColor:[JasonHelper colorwithHexString:chat_input[@"right"][@"style"][@"color"] alpha:1.0] forState:UIControlStateNormal];
                             }
 
-                    // set "color:disabled"
+                            // set "color:disabled"
                             if (chat_input[@"right"][@"style"] && chat_input[@"right"][@"style"][@"color:disabled"]) {
                                 [button setTitleColor:[JasonHelper colorwithHexString:chat_input[@"right"][@"style"][@"color:disabled"] alpha:1.0] forState:UIControlStateDisabled];
                             } else {
-                    // default
+                                // default
                                 [button setTitleColor:[JasonHelper colorwithHexString:chat_input[@"right"][@"style"][@"color"] alpha:1.0] forState:UIControlStateDisabled];
                             }
                         }

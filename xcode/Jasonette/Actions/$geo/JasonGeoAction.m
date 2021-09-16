@@ -39,18 +39,18 @@
                           delayUntilAuthorized:YES  // This parameter is optional, defaults to NO if omitted
                                          block:^(CLLocation * currentLocation, INTULocationAccuracy achievedAccuracy, INTULocationStatus status) {
                                              if (status == INTULocationStatusSuccess) {
-                                             // Request succeeded, meaning achievedAccuracy is at least the requested accuracy, and
-                                             // currentLocation contains the device's current location.
-                                             NSString * coord = [NSString stringWithFormat:@"%g,%g", currentLocation.coordinate.latitude, currentLocation.coordinate.longitude];
-                                             [[Jason client] success:@{ @"coord": coord }];
+                                                 // Request succeeded, meaning achievedAccuracy is at least the requested accuracy, and
+                                                 // currentLocation contains the device's current location.
+                                                 NSString * coord = [NSString stringWithFormat:@"%g,%g", currentLocation.coordinate.latitude, currentLocation.coordinate.longitude];
+                                                 [[Jason client] success:@{ @"coord": coord }];
                                              } else if (status == INTULocationStatusTimedOut) {
-                                             // Wasn't able to locate the user with the requested accuracy within the timeout interval.
-                                             // However, currentLocation contains the best location available (if any) as of right now,
-                                             // and achievedAccuracy has info on the accuracy/recency of the location in currentLocation.
-                                             NSString * coord = [NSString stringWithFormat:@"%g,%g", currentLocation.coordinate.latitude, currentLocation.coordinate.longitude];
-                                             [[Jason client] success:@{ @"coord": coord }];
+                                                 // Wasn't able to locate the user with the requested accuracy within the timeout interval.
+                                                 // However, currentLocation contains the best location available (if any) as of right now,
+                                                 // and achievedAccuracy has info on the accuracy/recency of the location in currentLocation.
+                                                 NSString * coord = [NSString stringWithFormat:@"%g,%g", currentLocation.coordinate.latitude, currentLocation.coordinate.longitude];
+                                                 [[Jason client] success:@{ @"coord": coord }];
                                              } else {
-                                             [[Jason client] error];
+                                                 [[Jason client] error];
                                              }
                                          }];
 }

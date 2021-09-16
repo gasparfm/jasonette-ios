@@ -13,7 +13,13 @@
                            data:(NSData *)data
                           error:(NSError * __autoreleasing *)errorPointer
 {
-    id responseObject = [super responseObjectForResponse:response data:data error:errorPointer];
+    /*
+     * Using NSJSONReadingAllowFragments enables parsing JSON files that are just
+     * a number or string. Accepted JSON can now start with {}, [], "", 0-9.
+     */
+    AFJSONResponseSerializer * serializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingFragmentsAllowed];
+
+    id responseObject = [serializer responseObjectForResponse:response data:data error:errorPointer];
 
     if (*errorPointer) {
         NSError * error = *errorPointer;

@@ -165,16 +165,16 @@
                                                     DTLogWarning (@"Alert OK");
 
                                                     if (form && form.count > 0) {
-                                                    for (NSString * input_name in textFields) {
-                                                    UITextField * textField = (UITextField *)textFields[input_name];
-                                                    [form_inputs               setObject:textField.text
-                                                    forKey:input_name];
-                                                    }
+                                                        for (NSString * input_name in textFields) {
+                                                            UITextField * textField = (UITextField *)textFields[input_name];
+                                                            [form_inputs setObject:textField.text
+                                                                            forKey:input_name];
+                                                        }
 
-                                                    DTLogDebug (@"Sending Form Inputs %@", form_inputs);
-                                                    [[Jason client] success:form_inputs];
+                                                        DTLogDebug (@"Sending Form Inputs %@", form_inputs);
+                                                        [[Jason client] success:form_inputs];
                                                     } else {
-                                                    [[Jason client] success];
+                                                        [[Jason client] success];
                                                     }
                                                 }];
 
@@ -183,8 +183,8 @@
                                                     handler:^(UIAlertAction * action) {
                                                         DTLogWarning (@"Alert Cancel");
                                                         [[Jason client] error];
-                                                        [alert                           dismissViewControllerAnimated:YES
-                                                            completion:nil];
+                                                        [alert dismissViewControllerAnimated:YES
+                                                                                  completion:nil];
                                                     }];
 
     if (cancelButtonEnabled) {
@@ -222,13 +222,13 @@
                                              }
                                             completed:^(UIImage * image, NSError * error, SDImageCacheType cacheType, BOOL finished, NSURL * imageURL) {
                                                 if (image) {
-                                                [share_items addObject:image];
+                                                    [share_items addObject:image];
                                                 }
 
                                                 counter--;
 
                                                 if (counter == 0) {
-                                                [self openShareWith:share_items];
+                                                    [self openShareWith:share_items];
                                                 }
                                             }];
                     } else if (file_url) {
@@ -347,8 +347,8 @@
     // Present the controller
     [controller setCompletionWithItemsHandler:
      ^(NSString * activityType, BOOL completed, NSArray * returnedItems, NSError * activityError) {
-        [[Jason client] success];
-    }];
+         [[Jason client] success];
+     }];
 
     dispatch_async (dispatch_get_main_queue (), ^{
         [self.VC.navigationController presentViewController:controller animated:YES completion:nil];
@@ -368,9 +368,9 @@
                                                           style:UIAlertActionStyleDefault
                                                         handler:^(UIAlertAction * action) {
                                                             if (item[@"href"]) {
-                                                            [[Jason client] go:item[@"href"]];
+                                                                [[Jason client] go:item[@"href"]];
                                                             } else if (item[@"action"]) {
-                                                            [[Jason client] call:item[@"action"]];
+                                                                [[Jason client] call:item[@"action"]];
                                                             }
                                                         }];
         [alert addAction:action];
@@ -422,6 +422,7 @@
 
     // Create date selection view controller
     RMDateSelectionViewController * dateSelectionController = [RMDateSelectionViewController actionControllerWithStyle:style selectAction:selectAction andCancelAction:cancelAction];
+
     dateSelectionController.title = title;
     dateSelectionController.message = description;
 
@@ -449,19 +450,19 @@
         case APAddressBookAccessUnknown: {
             // Application didn't request address book access yet
             [addressbook requestAccess:^(BOOL granted, NSError * error)
-            {
-                if (error) {
-                    DTLogWarning (@"%@", error);
-                    [[Jason client] error];
-                } else {
-                    if (granted) {
-                        [self fetchAddressbook:addressbook];
-                    } else {
-                        DTLogWarning (@"%@", error);
-                        [[Jason client] error];
-                    }
-                }
-            }];
+                             {
+                                 if (error) {
+                                     DTLogWarning (@"%@", error);
+                                     [[Jason client] error];
+                                 } else {
+                                     if (granted) {
+                                         [self fetchAddressbook:addressbook];
+                                     } else {
+                                         DTLogWarning (@"%@", error);
+                                         [[Jason client] error];
+                                     }
+                                 }
+                             }];
             break;
         }
 
@@ -488,24 +489,24 @@
 
     dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         [addressbook loadContacts:^(NSArray <APContact *> * contacts, NSError * error)
-        {
-            // hide activity
-            if (!error) {
-                // do something with contacts array
-                NSMutableArray * result = [NSMutableArray array];
-                [contacts enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL * stop) {
-                              [result addObject:[NSDictionary           dictionaryWithObjects:@[[self contactName:obj], [self contactPhones:obj], [self contactEmails:obj]]
-                                                                            forKeys:@[@"name", @"phone", @"email"]]];
-                          }];
+                         {
+                             // hide activity
+                             if (!error) {
+                                 // do something with contacts array
+                                 NSMutableArray * result = [NSMutableArray array];
+                                 [contacts enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL * stop) {
+                                               [result addObject:[NSDictionary   dictionaryWithObjects:@[[self contactName:obj], [self contactPhones:obj], [self contactEmails:obj]]
+                                                                                     forKeys:@[@"name", @"phone", @"email"]]];
+                                 }];
 
-                DTLogDebug (@"Contacts %@", result);
-                [[Jason client] success:result];
-            } else {
-                // show error
-                DTLogDebug (@"%@", error);
-                [[Jason client] error];
-            }
-        }];
+                                 DTLogDebug (@"Contacts %@", result);
+                                 [[Jason client] success:result];
+                             } else {
+                                 // show error
+                                 DTLogDebug (@"%@", error);
+                                 [[Jason client] error];
+                             }
+                         }];
     });
 }
 

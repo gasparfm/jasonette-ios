@@ -1,6 +1,6 @@
 {
   "name": "SocketRocket",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "summary": "A conforming WebSocket (RFC 6455) client library for iOS, macOS and tvOS.",
   "homepage": "https://github.com/facebook/SocketRocket",
   "authors": {
@@ -11,7 +11,7 @@
   "license": "BSD",
   "source": {
     "git": "https://github.com/facebook/SocketRocket.git",
-    "tag": "0.5.1"
+    "tag": "0.5.2"
   },
   "requires_arc": true,
   "source_files": "SocketRocket/**/*.{h,m}",
