@@ -4316,6 +4316,13 @@
                     // Hide tab bar before opening modal
                     vc.extendedLayoutIncludesOpaqueBars = YES;
                     root.tabBar.hidden = YES;
+                    
+                    // If full screen is not used then some lifecycle events are not triggered
+                    // causing troubles later in other transition styles.
+                    // This only happens in iOS 13 and up
+                    if (@available(iOS 13, *)) {
+                        tab.modalPresentationStyle = UIModalPresentationFullScreen;
+                    }
 
                     [root presentViewController:tab
                                        animated:YES
