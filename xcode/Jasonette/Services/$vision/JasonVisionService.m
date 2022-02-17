@@ -47,6 +47,8 @@
     if (![JasonMemory client].executing) {
         for (AVMetadataObject * metadata in metadataObjects) {
             AVMetadataMachineReadableCodeObject * transformed = (AVMetadataMachineReadableCodeObject *)metadata;
+            if (![transformed isKindOfClass:[AVMetadataMachineReadableCodeObject class]])
+                return;
             self.is_open = NO;
             [[Jason client] call:events[@"$vision.onscan"]
                             with:@{
