@@ -3925,6 +3925,11 @@
     if (tab[@"badge"] && ![[tab[@"badge"] description] isEqualToString:@""]) {
         [item setBadgeValue:[tab[@"badge"] description]];
     }
+    
+    // Enable removing the badge circle by passing null or empty as the value
+    if(!tab[@"badge"] || [[tab[@"badge"] description] isEqualToString:@""]) {
+        [item setBadgeValue:nil];
+    }
 }
 
 - (void)setTabImage:(UIImage *)image withTab:(NSDictionary *)tab andItem:(UITabBarItem *)item {
