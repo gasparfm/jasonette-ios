@@ -18,6 +18,21 @@
 	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLIconFile</key>
+			<string>placeholder@2x</string>
+			<key>CFBundleURLName</key>
+			<string>com.jasonelle.jasonette.ios</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>jasonette</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -33,6 +48,8 @@
 	<string>used to access camera api</string>
 	<key>NSContactsUsageDescription</key>
 	<string>used to access contacts api</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>used to access location api</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>used to access location api</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -41,8 +58,6 @@
 	<string>used to write to photo library</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>used to access photo library</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>used to access location api</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Your reason, why you want to track the user</string>
 	<key>UILaunchStoryboardName</key>
