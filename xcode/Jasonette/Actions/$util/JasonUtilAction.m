@@ -83,7 +83,7 @@
 }
 
 - (void)alert {
-#pragma message "TODO: Add button configuration"
+    // TODO: Add button configuration"
 
     DTLogInfo (@"Open $util.alert");
 
@@ -430,7 +430,7 @@
     [self.VC.tabBarController presentViewController:dateSelectionController animated:YES completion:nil];
 }
 
-#pragma message "TODO: Update with the new Contacts API"
+// TODO: Update with the new Contacts API
 - (void)addressbook {
     DTLogInfo (@"Open $util.addressbook");
 

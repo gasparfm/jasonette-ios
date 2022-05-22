@@ -34,9 +34,10 @@
 }
 
 - (void)loadCookies {
-    NSArray * cookies = [NSKeyedUnarchiver
-                         unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults]
-                                                  objectForKey:@"sessionCookies"]];
+    
+    NSError * error = nil;
+    
+    NSArray * cookies = (NSArray *)[NSKeyedUnarchiver unarchivedObjectOfClass:NSArray.class fromData:[NSUserDefaults.standardUserDefaults objectForKey:@"sessionCookies"] error:&error];
 
     NSHTTPCookieStorage * cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
 
@@ -94,7 +95,7 @@
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [manager.operationQueue cancelAllOperations];
 
-#pragma message "$network.request POST"
+            // MARK:  "$network.request POST"
 
             if (self.options[@"multipart"]) {
                 [manager POST:url
@@ -142,7 +143,7 @@
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [manager.operationQueue cancelAllOperations];
 
-#pragma message "$network.request PUT"
+            // MARK:  "$network.request PUT"
 
             [manager   PUT:url
                 parameters:parameters
@@ -164,7 +165,7 @@
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [manager.operationQueue cancelAllOperations];
 
-#pragma message "$network.request DELETE"
+            // MARK:  "$network.request DELETE"
 
             [manager DELETE:url
                  parameters:parameters
@@ -187,7 +188,7 @@
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [manager.operationQueue cancelAllOperations];
 
-#pragma message "$network.request HEAD"
+            // MARK:  "$network.request HEAD"
 
             [manager  HEAD:url
                 parameters:parameters
@@ -210,7 +211,7 @@
         dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [manager.operationQueue cancelAllOperations];
 
-#pragma message "$network.request PATCH"
+            // MARK:  "$network.request PATCH"
 
             [manager PATCH:url
                 parameters:parameters
@@ -234,7 +235,7 @@
     dispatch_async (dispatch_get_global_queue (DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         [manager.operationQueue cancelAllOperations];
 
-#pragma message "$network.request GET"
+        // MARK:  "$network.request GET"
 
         [manager   GET:url
             parameters:parameters
@@ -360,7 +361,7 @@
 
     [manager.operationQueue cancelAllOperations];
 
-#pragma message "Sign URL Request"
+    // MARK:  "Sign URL Request"
 
     [manager   GET:sign_url
         parameters:parameters

@@ -1373,7 +1373,7 @@
                 }
 
                 // 6. Start request
-#pragma message "Start Request in Include"
+                // MARK:  "Start Request in Include"
                 
                 DTLogDebug(@"Mixin Fetching %@ With Params %@", url, parsedMixinItems[url]);
                 
@@ -1535,7 +1535,7 @@
                 }
 
                 // 5. Start request
-#pragma message "Start Request in Require"
+                // MARK:  "Start Request in Require"
                 [manager   GET:url
                     parameters:parameters
                        headers:nil
@@ -2212,7 +2212,11 @@
                 // string type (old version, will deprecate)
                 dict = (NSDictionary *)data;
             } else {
-                dict = (NSDictionary *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+                NSError * unarchiveError = nil;
+                dict = (NSDictionary *)[NSKeyedUnarchiver unarchivedObjectOfClass:NSDictionary.class fromData:data error:&unarchiveError];
+                if (unarchiveError) {
+                    DTLogError(@"%@", unarchiveError.description);
+                }
             }
 
             if (dict && dict.count > 0) {
@@ -2327,7 +2331,11 @@
         NSData * data = [NSData dataWithContentsOfFile:path];
 
         if (data && data.length > 0) {
-            NSDictionary * responseObject = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            NSError * unarchiveError = nil;
+            NSDictionary * responseObject = (NSDictionary *)[NSKeyedUnarchiver unarchivedObjectOfClass:NSDictionary.class fromData:data error:&unarchiveError];
+            if (unarchiveError) {
+                DTLogError(@"%@", unarchiveError.description);
+            }
 
             if (responseObject && responseObject[@"$jason"] && responseObject[@"$jason"][@"head"] && responseObject[@"$jason"][@"head"][@"offline"]) {
                 // get rid of $load and $show so they don't get triggered
@@ -2392,7 +2400,7 @@
 
             manager.responseSerializer = jsonResponseSerializer;
 
-#pragma message "Start Request in Reload"
+            // MARK:  "Start Request in Reload"
 
             [manager   GET:self->VC.url
                 parameters:parameters
@@ -2671,10 +2679,11 @@
 
             DTLogDebug (@"Loading Background with Payload %@", payload);
 
-#pragma message "JasonAgentService Setup"
+            // MARK:  "JasonAgentService Setup"
             JasonAgentService * agent = self.services[@"JasonAgentService"];
 
-            vc.background = [agent setup:payload withId:payload[@"id"]];
+            WKWebView * webview = [agent setup:payload withId:payload[@"id"]];
+            vc.background = webview;
 
             // Need to make the background transparent so that it doesn't flash white when first loading
             vc.background.opaque = NO;
@@ -2682,7 +2691,7 @@
             vc.background.hidden = NO;
 
 
-#pragma message "Agent Webview frame"
+            // MARK:  "Agent Webview frame"
             int height = [UIScreen mainScreen].bounds.size.height;
             int width = [UIScreen mainScreen].bounds.size.width;
             int x = 0;
@@ -2744,8 +2753,19 @@
 
             [progressView setFrame:CGRectMake (0, vc.background.frame.origin.y + navHeight + 20, vc.background.frame.size.width, progressView.frame.size.height)];
             [progressView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
+            
+            // Add RefreshControl
+            if(bg && bg[@"options"] && bg[@"options"][@"pull"]) {
+                if ([bg[@"options"][@"pull"] boolValue] || [bg[@"options"][@"pull"] isKindOfClass:NSDictionary.class]) {
+                    
+                    UIRefreshControl * refresh = [UIRefreshControl new];
+                    [refresh addTarget:self action:@selector(pullFromBackgroundWebView:) forControlEvents:UIControlEventValueChanged];
+                    
+                    webview.scrollView.refreshControl = refresh;
+                }
+            }
 
-#pragma message "Webview Styles"
+            // MARK:  "Webview Styles"
 
             if (bg[@"style"]) {
                 if (bg[@"style"][@"background"]) {
@@ -2761,6 +2781,25 @@
         [vc.view addSubview:vc.background];
         [vc.view sendSubviewToBack:vc.background];
     }
+}
+
+- (void) pullFromBackgroundWebView: (UIRefreshControl *) sender {
+    [sender endRefreshing];
+    
+    // Delay execution of the block for 0.5 seconds.
+    // To allow time for the previous action to complete
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        NSDictionary * events = [[[Jason client] getVC] valueForKey:@"events"];
+
+        if (events) {
+            if (events[@"$pull"]) {
+                DTLogDebug (@"Calling $pull event");
+                [[Jason client]
+                 call:events[@"$pull"]
+                 with:@{ @"$jason": @{} }];
+            }
+        }
+    });
 }
 
 - (void)buildCamera:(NSDictionary *)options forVC:(JasonViewController *)vc {
@@ -3034,7 +3073,7 @@
         }
     }
 
-    navigationController.navigationBar.barStyle = UIStatusBarStyleLightContent;
+    navigationController.navigationBar.barStyle = UIBarStyleDefault;
     navigationController.navigationBar.titleTextAttributes = @{
         NSForegroundColorAttributeName: color,
         NSFontAttributeName: [UIFont
@@ -3054,13 +3093,13 @@
             color = [JasonHelper colorwithHexString:headStyle[@"color"] alpha:1.0];
         }
 
-        navigationController.navigationBar.barStyle = UIStatusBarStyleLightContent;
+        navigationController.navigationBar.barStyle = UIBarStyleBlack;
 
         if (headStyle[@"theme"]) {
-            navigationController.navigationBar.barStyle = UIStatusBarStyleDefault;
+            navigationController.navigationBar.barStyle = UIBarStyleDefault;
         }
 
-#pragma message "Sets the Status Bar"
+        // MARK:  "Sets the Status Bar"
 
         if (headStyle[@"bar"]) {
             NSString * mode = [headStyle[@"bar"] lowercaseString];
@@ -3070,11 +3109,11 @@
                 [mode isEqualToString:@"black"] ||
                 [mode isEqualToString:@"opaque"]) {
                 DTLogDebug (@"Status Bar Default Color");
-                navigationController.navigationBar.barStyle = UIStatusBarStyleDefault;
+                navigationController.navigationBar.barStyle = UIBarStyleBlack;
             } else if ([mode isEqualToString:@"light"] ||
                        [mode isEqualToString:@"white"]) {
                 DTLogDebug (@"Status Bar White Color");
-                navigationController.navigationBar.barStyle = UIStatusBarStyleLightContent;
+                navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
             } else {
                 // hidden
                 // Note: To hide a status bar needs some special methods.
@@ -3108,7 +3147,7 @@
                                           size:[font_size integerValue]]
         };
     } else {
-        navigationController.navigationBar.barStyle = UIStatusBarStyleLightContent;
+        navigationController.navigationBar.barStyle = UIBarStyleDefault;
         navigationController.hidesBarsOnSwipe = NO;
         NSString * font_name = @"HelveticaNeue-CondensedBold";
         NSString * font_size = @"18";
@@ -3815,7 +3854,7 @@
 
             DTLogDebug (@"Tab %ld contains href %@", indexOfTab, href);
 
-#pragma message "TabBar Refresh"
+            // MARK:  "TabBar Refresh"
 
             if (self->VC.tabNeedsRefresh) {
                 DTLogDebug (@"Tab %ld Needs Refresh", indexOfTab);
@@ -4159,9 +4198,14 @@
             if (href[@"options"] && (href[@"options"][@"reader"] ||
                                      href[@"options"][@"reader_mode"])) {
                 DTLogDebug (@"Reader Mode Activated");
+                
+                SFSafariViewControllerConfiguration * configuration = [SFSafariViewControllerConfiguration new];
+                
+                configuration.entersReaderIfAvailable = YES;
+                
                 vc = [[SFSafariViewController alloc]
                       initWithURL:URL
-                                             entersReaderIfAvailable:YES];
+                      configuration:configuration];
             } else {
                 vc = [[SFSafariViewController alloc] initWithURL:URL];
             }
@@ -4183,7 +4227,7 @@
             ****************************************************************************/
             NSString * url = href[@"url"];
 
-#pragma message "$href action"
+            // MARK:  "$href action"
 
             DTLogDebug (@"Opening External URL %@", url);
 

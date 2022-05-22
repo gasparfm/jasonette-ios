@@ -121,7 +121,7 @@ static NSArray * _services;
     SEL initialize = NSSelectorFromString (@"initialize:");
 
     if ([extension respondsToSelector:initialize]) {
-#pragma message "TODO: Find a way to remove those clang diagnostic pragmas"
+        // TODO: Find a way to remove those clang diagnostic pragmas"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
         [extension performSelector:initialize
