@@ -121,7 +121,7 @@ static NSArray * _services;
     SEL initialize = NSSelectorFromString (@"initialize:");
 
     if ([extension respondsToSelector:initialize]) {
-#pragma message "TODO: Find a way to remove those clang diagnostic pragmas"
+        // TODO: Find a way to remove those clang diagnostic pragmas"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
         [extension performSelector:initialize
@@ -269,7 +269,19 @@ static NSArray * _services;
         DTLogInfo (@"://href? call detected");
 
         NSString * u = [url absoluteString];
+        
         NSString * href_url = [JasonHelper getParamValueFor:@"url" fromUrl:u];
+        
+        NSString * href_url_encoded = [JasonHelper getParamValueFor:@"encoded" fromUrl:u];
+        DTLogDebug(@"Detected url encoded %@", href_url_encoded);
+        
+        if (href_url_encoded) {
+            NSData * data = [[NSData alloc] initWithBase64EncodedString:href_url_encoded options:kNilOptions];
+            href_url = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            
+            DTLogDebug(@"new href %@", href_url);
+        }
+        
         NSString * href_view = [JasonHelper getParamValueFor:@"view" fromUrl:u];
         NSString * href_transition = [JasonHelper getParamValueFor:@"transition" fromUrl:u];
 

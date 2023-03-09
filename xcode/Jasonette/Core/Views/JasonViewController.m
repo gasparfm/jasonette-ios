@@ -279,7 +279,7 @@
     }
 }
 
-#pragma message "StatusBar Hiiden"
+// MARK: "StatusBar Hiden"
 - (BOOL)prefersStatusBarHidden {
     return self.navigationController.isNavigationBarHidden;
 }
@@ -892,7 +892,7 @@
         return;
     }
 
-    if (isEditing && self.searchController.dimsBackgroundDuringPresentation) {
+    if (isEditing && self.searchController.obscuresBackgroundDuringPresentation) {
         [self.view endEditing:YES];
         [self.tableView reloadData];
     } else {
@@ -1307,23 +1307,23 @@
                     NSString * theme = style[@"theme"];
 
                     if ([theme isEqualToString:@"light"]) {
-                        self.searchController.dimsBackgroundDuringPresentation = NO;
+                        self.searchController.obscuresBackgroundDuringPresentation = NO;
                     } else {
-                        self.searchController.dimsBackgroundDuringPresentation = YES;
+                        self.searchController.obscuresBackgroundDuringPresentation = YES;
                     }
 
                     NSString * dark = style[@"dark"];
 
                     if (dark) {
-                        self.searchController.dimsBackgroundDuringPresentation = YES;
+                        self.searchController.obscuresBackgroundDuringPresentation = YES;
                     } else {
-                        self.searchController.dimsBackgroundDuringPresentation = NO;
+                        self.searchController.obscuresBackgroundDuringPresentation = NO;
                     }
 
                     // When there's no action, use the default search behavior
                     if (!search_action) {
                         self.searchController.searchResultsUpdater = self;
-                        self.searchController.dimsBackgroundDuringPresentation = NO;
+                        self.searchController.obscuresBackgroundDuringPresentation = NO;
                     }
 
                     self.searchController.searchBar.delegate = self;
@@ -1415,15 +1415,15 @@
                         NSString * theme = style[@"theme"];
 
                         if ([theme isEqualToString:@"light"]) {
-                            self.searchController.dimsBackgroundDuringPresentation = NO;
+                            self.searchController.obscuresBackgroundDuringPresentation = NO;
                         } else {
-                            self.searchController.dimsBackgroundDuringPresentation = YES;
+                            self.searchController.obscuresBackgroundDuringPresentation = YES;
                         }
 
                         // When there's no action, use the default search behavior
                         if (!search_action) {
                             self.searchController.searchResultsUpdater = self;
-                            self.searchController.dimsBackgroundDuringPresentation = NO;
+                            self.searchController.obscuresBackgroundDuringPresentation = NO;
                         }
 
                         self.searchController.searchBar.delegate = self;

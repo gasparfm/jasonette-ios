@@ -6,6 +6,12 @@
                 "$foreground": {
                     "type": "$reload"
                 }
+                "$pull": {
+                    "type": "$util.alert",
+                    "options": {
+                        "title": "Hello"
+                    }
+                }
             }
         },
         "body": {

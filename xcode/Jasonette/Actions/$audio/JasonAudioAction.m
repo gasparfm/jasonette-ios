@@ -219,7 +219,10 @@
                 if (!image_url) {
                     UIImage * i = [UIImage imageNamed:@"placeholder"];
 
-                    MPMediaItemArtwork * albumArt = [[MPMediaItemArtwork alloc] initWithImage:i];
+                    MPMediaItemArtwork * albumArt = [[MPMediaItemArtwork alloc] initWithBoundsSize:i.size requestHandler:^UIImage * _Nonnull(CGSize size) {
+                        return i;
+                    }];
+                
                     [songInfo setObject:title forKey:MPMediaItemPropertyTitle];
                     [songInfo setObject:author forKey:MPMediaItemPropertyArtist];
                     [songInfo setObject:album forKey:MPMediaItemPropertyAlbumTitle];
@@ -233,7 +236,9 @@
                                              // progression tracking code
                                          }
                                         completed:^(UIImage * i, NSError * error, SDImageCacheType cacheType, BOOL finished, NSURL * imageURL) {
-                                            MPMediaItemArtwork * albumArt = [[MPMediaItemArtwork alloc] initWithImage:i];
+                                            MPMediaItemArtwork * albumArt = [[MPMediaItemArtwork alloc] initWithBoundsSize:i.size requestHandler:^UIImage * _Nonnull(CGSize size) {
+                                                return i;
+                                            }];
                                             [songInfo setObject:title
                                                          forKey:MPMediaItemPropertyTitle];
                                             [songInfo setObject:author

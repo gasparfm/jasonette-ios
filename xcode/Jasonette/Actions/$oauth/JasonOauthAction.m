@@ -11,8 +11,10 @@
 #import "JasonNetworking.h"
 #import "JasonLogger.h"
 
-#pragma message "TODO: Update managers to use JasonNetworking"
+// TODO: Update managers to use JasonNetworking
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 @implementation JasonOauthAction
 - (void)performSocialFrameworkRequestFor:(ACAccount *)account {
     NSString * path = self.options[@"path"];
@@ -1206,3 +1208,4 @@
 }
 
 @end
+#pragma clang diagnostic pop
